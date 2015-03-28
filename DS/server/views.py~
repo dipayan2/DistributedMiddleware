@@ -10,7 +10,7 @@ import os
 @csrf_exempt
 def index(request):
 	if request.method == 'POST':
-#		print request.META['HTTP_SAM']
+		print request.META['HTTP_SAM']
 #		print request.body
 		for filename, file in request.FILES.iteritems():
 			name = request.FILES[filename].name
