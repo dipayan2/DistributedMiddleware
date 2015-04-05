@@ -1,7 +1,7 @@
 users = {'admin':'admin123'}
 
 def dict_type():
-	return [-1,-1,'started','N/A']
+	return [-1,-1,'NA','NA','started','NA']
 
 jobs = {}
 
@@ -14,11 +14,11 @@ def check_user(user,passwd):
 	except KeyError:
 		return False
 
-def add_job(user,jobid,client_id,status,output):
+def add_job(user,jobid,client_id,input_file,command_file,status,output):
 	if jobid in jobs.keys():
 		return False
 	else:
-		job = [user,client_id,status,output]
+		job = [user,client_id,input_file,command_file,status,output]
 		jobs[jobid] = job
 		return True
 
