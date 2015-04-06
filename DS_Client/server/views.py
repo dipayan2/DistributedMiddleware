@@ -17,7 +17,7 @@ from subprocess import Popen, PIPE
 @csrf_exempt
 def index(request):
 
-	dirWhereItWillExec = '/home/samprit/Desktop/DS/'
+	dirWhereItWillExec = '/home/dipayan/Desktop/'
 
 	if request.method == 'POST':
 
@@ -43,10 +43,11 @@ def index(request):
 		# print commandList
 
 		# Output File where the results will be saved
-		outputFile = request.POST.__getitem__('Output')
-		outputFile = outputFile.replace('+',' ')
+		# outputFile = request.POST.__getitem__('Output')
+		# outputFile = outputFile.replace('+',' ')
 		# print outputFile
 
+		# time.sleep(10)
 
 		# Run the process
 		process = Popen(commandList, stdout=PIPE, cwd = dirWhereItWillExec)

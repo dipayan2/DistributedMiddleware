@@ -1,8 +1,10 @@
-users = {'admin':'admin123'}
+import json
 
-def dict_type():
-	return [-1,-1,'NA','NA','started','NA']
+from data import *
 
+
+# def dict_type():
+# 	return [-1,-1,'NA','NA','started','NA']
 jobs = {}
 
 def check_user(user,passwd):
@@ -20,16 +22,19 @@ def add_job(user,jobid,client_id,input_file,command_file,status,output):
 	else:
 		job = [user,client_id,input_file,command_file,status,output]
 		jobs[jobid] = job
+		saveAsJson(jobs)
 		return True
 
 def update_job(jobid,status,output):
 	try:	
 		if status == 'complete':
-			jobs[jobid][2] = status
-			jobs[jobid][3] = output
+			jobs[jobid][4] = status
+			jobs[jobid][5] = output
+			saveAsJson(jobs)
 			return True
 		elif status == 'aborted':
-			jobs[jobid][2] = status
+			jobs[jobid][4] = status
+			saveAsJson(jobs)
 			return True
 		else:
 			return False

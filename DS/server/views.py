@@ -18,7 +18,7 @@ def index(request):
 
 	if request.method == 'POST':
 		ipAddrOfPOST = str(request.META['REMOTE_ADDR'])
-		
+		#save timestamp of post
 		# Save the file sent
 		for filename, file in request.FILES.iteritems():
 			name = request.FILES[filename].name
@@ -31,6 +31,13 @@ def index(request):
 		fileReceived = open(dirWhereItWillSave + name, "r+")
 		virtualMemory, swapMemory = fileReceived.read().split('\n')[0:2]
 		fileReceived.close()
+
+		#now submit jobs which have failed or not yet started to clients
+		pending_jobs = {}
+		for job in jobs:
+			if  jobs[job][4] == 'pending' or jobs[job][4] == 'failed':
+				pending_jobs[job] = jobs[job] 
+
 		
 		return HttpResponse("Got POST")
 	elif request.method == 'GET':
