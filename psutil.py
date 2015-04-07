@@ -13,7 +13,8 @@ import json
 from data import *
 
 # to store the nodes which are not working
-
+connect_timeout = 1.0
+read_timeout = 0.05
 # need to format the output
 def SendGet():
 	# This code will send get requests to all clients
@@ -22,8 +23,11 @@ def SendGet():
 	for Ip in ListofIP:
 		Addr = "http://"+str(Ip)
 		# Addr = "http://localhost:8001"
-		r = requests.get(Addr, proxies = proxyDict)
-		responseArr[Addr] = r.content
+		try:
+			r = requests.get(Addr, proxies = proxyDict, timeout = (connect_timeout, read_timeout))
+			responseArr[Addr] = r.content
+		except requests.exceptions.ConnectTimeout as e:
+			responseArr[Addr] = "Client Failed"
 
 
 	# with open(psutilFile, "w+") as g:

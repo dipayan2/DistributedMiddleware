@@ -12,6 +12,7 @@ def saveAsJson(data, filename):
 		files = jobFile
 	elif filename = "psutil":
 		files = psutilFile
+	# waiting lock here
 	with open(files, 'wb') as fp:
 		fcntl.flock(fp, fcntl.LOCK_EX)
 		json.dump(data, fp)
@@ -23,6 +24,7 @@ def loadFromJson(filename):
 	elif filename = "psutil":
 		files = psutilFile
 	with open(files, 'rb') as fp:
+	#waiting lock here
 		fcntl.flock(fp, fcntl.LOCK_EX)
 		data = json.load(fp)
 		fcntl.flock(fp, fcntl.LOCK_UN)

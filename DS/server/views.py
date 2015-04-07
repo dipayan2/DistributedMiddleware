@@ -8,15 +8,26 @@ from django.http import Http404
 import requests
 import time
 import os
+import fcntl
+import json
 
 from server_utils import *
 
 import psutil
 
 @csrf_exempt
+
+def retrieve_Job():
+	dirWhereItWillSave = ''
+	#retrieve the filename, command, outputfilename, username
+	job = [username, -1, dirWhereItWillSave + filename, command, 'pending', outputfilename]
+	return job
+
 def index(request):
 
 	dirWhereItWillSave = '/home/subham/DS/'
+	name = 'jobidname.txt'
+	jobFile = 'jobFile.json'
 
 	if request.method == 'POST':
 		ipAddrOfPOST = str(request.META['REMOTE_ADDR'])
@@ -33,12 +44,27 @@ def index(request):
 		fileReceived = open(dirWhereItWillSave + name, "r+")
 		virtualMemory, swapMemory = fileReceived.read().split('\n')[0:2]
 		fileReceived.close()
+		jobid = 0
+		## Function of reading and writing in file
+		with open(dirWhereItWillSave+name,'r+') as fp:
+			fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock to be implemented
+			data = fp.read()
+			jobid = int(data)+1
+			fp.seek(0)
+			fp.write(jobid)
+			fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock to be implemented
+		job = retrieve_Job()
+		with open(dirWhereItWillSave+ jobFile, 'r+b') as fp:
+			fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock
+			jobs = json.load(fp)
+			jobs[jobid] = job
+			fp.seek(0)
+			json.dump(jobs, fp)
+			fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock
 
-		#now submit jobs which have failed or not yet started to clients
-		pending_jobs = {}
-		for job in jobs:
-			if  jobs[job][4] == 'pending' or jobs[job][4] == 'failed':
-				pending_jobs[job] = jobs[job] 
+
+
+
 
 		
 		return HttpResponse("Got POST")
