@@ -22,7 +22,7 @@ def add_job(user,jobid,client_id,input_file,command_file,status,output):
 	else:
 		job = [user,client_id,input_file,command_file,status,output]
 		jobs[jobid] = job
-		saveAsJson(jobs)
+		saveAsJson(jobs,"jobs")
 		return True
 
 def update_job(jobid,status,output):
@@ -30,11 +30,11 @@ def update_job(jobid,status,output):
 		if status == 'complete':
 			jobs[jobid][4] = status
 			jobs[jobid][5] = output
-			saveAsJson(jobs)
+			saveAsJson(jobs,"jobs")
 			return True
 		elif status == 'aborted':
 			jobs[jobid][4] = status
-			saveAsJson(jobs)
+			saveAsJson(jobs,"jobs")
 			return True
 		else:
 			return False

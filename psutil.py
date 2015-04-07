@@ -12,14 +12,9 @@ import json
 
 from data import *
 
+# to store the nodes which are not working
 
-proxyDict = { 
-			"http"  : "", 
-			"https" : "", 
-			"ftp"   : ""
-			}
-
-
+# need to format the output
 def SendGet():
 	# This code will send get requests to all clients
 	threading.Timer(10.0,SendGet).start()
@@ -37,7 +32,7 @@ def SendGet():
 	# 		g.write(str(resp) + "\n")
 	# 	fcntl.flock(g, fcntl.LOCK_UN)
 
-	saveAsJson(responseArr)
+	saveAsJson(responseArr,"psutil")
 
 
 
