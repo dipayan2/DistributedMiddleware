@@ -69,6 +69,7 @@ def index(request):
 		
 		return HttpResponse("Got POST")
 	elif request.method == 'GET':
+		
 		print request
 		return HttpResponse("Sec Server is alive")
 	else:
