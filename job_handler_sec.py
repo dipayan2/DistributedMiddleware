@@ -24,7 +24,6 @@ class Submit_Jobs(threading.Thread):
 	    	#read jobs from file
 	    	#write job back to job dict
 	    	# write back to the json file
-	    	# send it to sec server also
 
 class Client_Failure(threading.Thread):
 
@@ -43,40 +42,40 @@ class Client_Failure(threading.Thread):
 			fcntl.flock(fp, fcntl.LOCK_UN) # waiting lock to be added
 
 
-
-LastClientUsed = 0
-NoClients = 1 # TO BE CHANGED
-# Should constantly loop arouund to find whether there is any pending job and send it to a client
-while True:
-	jobs = loadFromJson("jobs")
-	pending_jobs = {}
-	pendingJobList = []
-	for job in jobs:
-		if jobs[job][4] == 'pending' or jobs[job][4] == 'failed':
-			pending_jobs[job] = jobs[job]
-			pendingJobList.append(job)
-	if any(pending_jobs):
-		Client = loadFromJson("psutil")
-		for i in xrange(0,NoClients):
-			if Client[ListofIP[(LastClientUsed+i)% NoClients]][0] == -1:
-				FailedID = (LastClientUsed+ i) % NoClients
-				c = Client_Failure(FailedID)
-				c.start()
-			if Client[(ListofIP[(LastClientUsed+i) % NoClients]][0] > 15 MB:
-				LastClientUsed = (LastClientUsed+i) % NoClients
-				break
-		t = Submit_Jobs(pending_jobs[pendingJobList[0]], LastClientUsed)
-		t. start()
-		#This modifies the json file of job
-		# lock the file
-		# download the file 
-		del pending_jobs[pendingJobList[0]]
-		jobs[pendingJobList[0]][4] = 'started'
-		jobs[pendingJobList[0]][1] = clientid
-		del pendingJobList[0]
-		saveAsJson(jobs,"jobs")
-		# unlock the file
-	time.sleep(3)
+def handle_jobs_sec():
+	LastClientUsed = 0
+	NoClients = 1 # TO BE CHANGED
+	# Should constantly loop arouund to find whether there is any pending job and send it to a client
+	while True:
+		jobs = loadFromJson("jobs")
+		pending_jobs = {}
+		pendingJobList = []
+		for job in jobs:
+			if jobs[job][4] == 'pending' or jobs[job][4] == 'failed':
+				pending_jobs[job] = jobs[job]
+				pendingJobList.append(job)
+		if any(pending_jobs):
+			Client = loadFromJson("psutil")
+			for i in xrange(0,NoClients):
+				if Client[ListofIP[(LastClientUsed+i)% NoClients]][0] == -1:
+					FailedID = (LastClientUsed+ i) % NoClients
+					c = Client_Failure(FailedID)
+					c.start()
+				if Client[(ListofIP[(LastClientUsed+i) % NoClients]][0] > 15 MB:
+					LastClientUsed = (LastClientUsed+i) % NoClients
+					break
+			t = Submit_Jobs(pending_jobs[pendingJobList[0]], LastClientUsed)
+			t. start()
+			#This modifies the json file of job
+			# lock the file
+			# download the file 
+			del pending_jobs[pendingJobList[0]]
+			jobs[pendingJobList[0]][4] = 'started'
+			jobs[pendingJobList[0]][1] = clientid
+			del pendingJobList[0]
+			saveAsJson(jobs,"jobs")
+			# unlock the file
+		time.sleep(3)
 
 
 

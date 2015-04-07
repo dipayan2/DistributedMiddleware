@@ -3,6 +3,7 @@ import json
 
 users = {'admin':'admin123'}
 ListofIP = ["localhost:8001"]
+SecIP = "10.5.30.143:8001"
 
 psutilFile = "/home/dipayan/Desktop/Distributed-Systems-Project/psutilFile.json"
 jobFile = "/home/dipayan/Desktop/Distributed-Systems-Project/jobFile.json"
