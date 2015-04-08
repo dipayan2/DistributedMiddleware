@@ -17,7 +17,8 @@ from subprocess import Popen, PIPE
 @csrf_exempt
 def index(request):
 
-	dirWhereItWillExec = '/home/dipayan/Desktop/'
+	dirWhereItWillExec = '/home/samprit/Desktop/DS'
+	dirOfCleintPOSTFile = '/home/samprit/Desktop/DS/Distributed-Systems-Project/'
 
 	if request.method == 'POST':
 
@@ -42,21 +43,23 @@ def index(request):
 		commandList = command.split()
 		# print commandList
 
-		# Output File where the results will be saved
-		# outputFile = request.POST.__getitem__('Output')
-		# outputFile = outputFile.replace('+',' ')
-		# print outputFile
 
-		# time.sleep(10)
+		command = []
+		command.append("python")
+		command.append("clientPOST.py")
+		command.append(dirWhereItWillExec)
+		command.extend(commandList)
+		# print command
 
 		# Run the process
-		process = Popen(commandList, stdout=PIPE, cwd = dirWhereItWillExec)
-		(output, err) = process.communicate()
-		exit_code = process.wait()
+		process = Popen(command, stdout=PIPE, cwd = dirOfCleintPOSTFile)
+		# (output, err) = process.communicate()
+		# exit_code = process.wait()
 
-		print exit_code
+		# print exit_code
+		# print output, err, exit_code
 
-		return HttpResponse(output)
+		return HttpResponse("File Running")
 
 	elif request.method == 'GET':
 

@@ -5,13 +5,16 @@ users = {'admin':'admin123'}
 ListofIP = ["localhost:8001"]
 PrimIP = "10.5.30.143:8001"
 
+MainServerIP = "http://localhost:8000"
+SecondaryServerIP = "http://localhost:8001"
+
 psutilFile = "/home/dipayan/Desktop/Distributed-Systems-Project/psutilFile.json"
 jobFile = "/home/dipayan/Desktop/Distributed-Systems-Project/jobFile.json"
 
 def saveAsJson(data, filename):
 	if filename == "jobs":
 		files = jobFile
-	elif filename = "psutil":
+	elif filename == "psutil":
 		files = psutilFile
 	# waiting lock here
 	with open(files, 'wb') as fp:
@@ -22,7 +25,7 @@ def saveAsJson(data, filename):
 def loadFromJson(filename):
 	if filename == "jobs":
 		files = jobFile
-	elif filename = "psutil":
+	elif filename == "psutil":
 		files = psutilFile
 	with open(files, 'rb') as fp:
 	#waiting lock here
