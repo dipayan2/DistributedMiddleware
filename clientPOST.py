@@ -1,5 +1,6 @@
 from data import *
-import sys
+
+# import sys
 import time
 import requests
 

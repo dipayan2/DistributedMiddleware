@@ -52,6 +52,10 @@ def index(request):
 		jobID = request.POST.__getitem__('Jobid')
 
 
+		# How to access a list inside querydict
+		# print dict(request.POST)['list']
+
+
 		command = []
 		command.append("python")
 		command.append("clientPOST.py")
