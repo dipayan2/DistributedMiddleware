@@ -43,11 +43,13 @@ def SendGet():
 	saveAsJson(responseArr,"psutil")
 
 def SendGetPrim():
+	headerType = {'FROM': 'Server'}
+
 	t = threading.Timer(10.0,SendGet)
 	t.start()
 	Addr = "http://"+PrimIP
 	try:
-		r =  requests.get(Addr, proxies = proxyDict, timeout = (connect_timeout, read_timeout))
+		r =  requests.get(Addr, proxies = proxyDict, timeout = (connect_timeout, read_timeout),header = headerType)
 		responseSec = r.content
 	except as e:	
 		responseSec = "Prim Server failed"
