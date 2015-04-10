@@ -130,7 +130,10 @@ def index(request):
 			JobStatus = data[Jobid][4]
 			Output = data[Jobid][5]
 			ClientId = data[Jobid][1]
-			return HttpResponse(str(JobStatus)+":"+str(Output)+":"+str(ClientId)) #need to change
+			if JobStatus == "finished":
+				return HttpResponse(str(ClientId)+" : "+str(Output))
+			else:
+				return HttpResponse(str(ClientId)+" : "+str(JobStatus))
 		elif request.META['HTTP_FROM'] == 'Server':
 			return HttpResponse("IamOK") 
 		else:
