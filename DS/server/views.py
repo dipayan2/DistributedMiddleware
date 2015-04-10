@@ -94,7 +94,7 @@ def index(request):
 				fp.write(jobid)
 				fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock to be implemented
 			job = retrieve_Job(username,name,Command)
-			with open(dirWhereItWillSave+ jobFile, 'r+b') as fp:
+			with open(dirWhereItWillSave+ jobFile, 'w+') as fp:
 				fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock
 				jobs = json.load(fp)
 				jobs[jobid] = job
@@ -107,7 +107,7 @@ def index(request):
 			r = request.POST(url , data = payload, proxies = proxyDict)
 			return HttpResponse(jobid) #check 
 		elif From == 'Server':
-			with open(dirWhereItWillSave+ jobFile, 'r+b') as fp:
+			with open(dirWhereItWillSave+ jobFile, 'w+') as fp:
 				jobs = json.load(fp)
 				ClientID = int(request.POST.__getitem__['ClientID'])
 				if ClientID < 0:

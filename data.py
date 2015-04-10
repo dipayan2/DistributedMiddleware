@@ -27,16 +27,20 @@ def saveAsJson(data, filename):
 		fcntl.flock(fp, fcntl.LOCK_UN)
 
 def loadFromJson(filename):
-	if filename == "jobs":
-		files = jobFile
-	elif filename == "psutil":
-		files = psutilFile
-	with open(files, 'rb') as fp:
-	#waiting lock here
-		fcntl.flock(fp, fcntl.LOCK_EX)
-		data = json.load(fp)
-		fcntl.flock(fp, fcntl.LOCK_UN)
-	return data
+	try:
+		if filename == "jobs":
+			files = jobFile
+		elif filename == "psutil":
+			files = psutilFile
+		with open(files, 'rb') as fp:
+		#waiting lock here
+			fcntl.flock(fp, fcntl.LOCK_EX)
+			data = json.load(fp)
+			fcntl.flock(fp, fcntl.LOCK_UN)
+		return data
+	except Exception, e:
+		return {}
+	
 
 proxyDict = { 
 			"http"  : "", 

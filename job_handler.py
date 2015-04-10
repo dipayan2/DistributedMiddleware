@@ -27,14 +27,14 @@ class Submit_Jobs(threading.Thread):
 	    	else:
 	    		response = 0
 	    	if response == 0:
-	    		with open(jobFile,'r+b') as fp:
+	    		with open(jobFile,'w+') as fp:
 	    			fcntl.flock(fp,fcntl.LOCK_EX)
 	    			jobs = json.load(fp)
 	    			jobs[self.jobid][4] = 'failed-request'
 	    			jobs[self.jobid][1] = self.clientid
 	    			fcntl.flock(fp,fcntl.LOCK_EX)
 	    			url = 'http://'+SecondaryServerIP
-	    			payload = {'data' : jobs[self.jobid] , 'From' : 'Server','Jobid' = self.jobid , 'ClientID' = -1} # for secondary server to know who sent it need to change in the secondary server server part
+	    			payload = {'data' : jobs[self.jobid] , 'From' : 'Server','Jobid' : self.jobid , 'ClientID' : -1} # for secondary server to know who sent it need to change in the secondary server server part
 	    			# ClientID = -1 means no client failure, otherwise it means the given ID has failed
 	    			r = requests.post(url,data = payload, proxies= proxyDict) # can send only the jobs to reduce the messages
 
@@ -45,7 +45,7 @@ class Client_Failure(threading.Thread):
 		threading.Thread.__init__(self)
 		self.clientid = clientid
 	def run(self):
-		with open(jobFile, 'r+b') as fp:
+		with open(jobFile, 'w+') as fp:
 			fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock to be added
 			jobs = json.load(fp)
 			for job in jobs:
@@ -77,14 +77,14 @@ while True:
 				FailedID = (LastClientUsed+ i) % NoClients
 				c = Client_Failure(FailedID)
 				c.start()
-			if Client[(ListofIP[(LastClientUsed+i) % NoClients]] > 15000000:
+			if Client[ListofIP[(LastClientUsed+i) % NoClients]] > 15000000:
 				LastClientUsed = (LastClientUsed+i) % NoClients
 				break
 		t = Submit_Jobs(pending_jobs[pendingJobList[0]],pendingJobList[0], LastClientUsed)
 		t. start()
 		
 		del pending_jobs[pendingJobList[0]]
-		with open(jobFile,'r+b') as fp:
+		with open(jobFile,'w+') as fp:
 			fcntl.flock(fp,fcntl.LOCK_EX)
 			DwJob = json.load(fp)
 			if DwJob[pendingJobList[0]][4] == 'failed-request':
