@@ -100,7 +100,18 @@ def index(request):
 			###### Send to tejas's server
 			return HttpResponse(jobid) #check 
 		elif From == 'Server':
-
+			with open(dirWhereItWillSave+ jobFile, 'r+b') as fp:
+				jobs = json.load(fp)
+				ClientID = request.META['ClientID']
+				if ClientID < 0:
+					jobid = request.META['Jobid']
+					jobdata = request.META['data']
+					jobs[jobid] = jobdata
+				else:
+					for job in jobs:
+						if jobs[job][1] == Clientid and jobs[job][4] == "started" :
+						jobs[job][4] = "failed"
+				json.dump(jobs,fp)
 
 
 
