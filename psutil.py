@@ -24,12 +24,13 @@ def SendGet():
 		Addr = "http://"+str(Ip)
 		# Addr = "http://localhost:8001"
 		try:
-			r = requests.get(Addr, proxies = proxyDict, timeout = (connect_timeout, read_timeout))
+			r = requests.get(Addr, proxies = proxyDict, timeout = connect_timeout)
 			mem_data = r.content
 			mem = mem_data.split("free=")[1]
 			mem = mem.split("L")[0]
+			print "running"
 			responseArr[Addr] = int(mem)
-		except requests.exceptions.ConnectTimeout as e:
+		except Exception, e:
 			responseArr[Addr] = -1
 
 

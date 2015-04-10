@@ -3,7 +3,7 @@ import json
 import os
 
 users = {'admin':'admin123'}
-ListofIP = ["localhost:8001"]
+ListofIP = ["192.168.85.138:8000"]
 PrimIP = "10.5.30.143:8001"
 
 MainServerIP = "http://localhost:8000"
@@ -11,8 +11,8 @@ SecondaryServerIP = "http://localhost:8001"
 
 # psutilFile = "/home/dipayan/Desktop/Distributed-Systems-Project/psutilFile.json"
 # jobFile = "/home/dipayan/Desktop/Distributed-Systems-Project/jobFile.json"
-psutilFile = os.getcwd() + "/"
-jobFile = os.getcwd() + "/"
+psutilFile = os.getcwd() + "/psutilFile.json"
+jobFile = os.getcwd() + "/jobFile.json"
 
 def saveAsJson(data, filename):
 	if filename == "jobs":
@@ -20,6 +20,7 @@ def saveAsJson(data, filename):
 	elif filename == "psutil":
 		files = psutilFile
 	# waiting lock here
+	print files
 	with open(files, 'wb') as fp:
 		fcntl.flock(fp, fcntl.LOCK_EX)
 		json.dump(data, fp)
