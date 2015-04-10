@@ -61,7 +61,7 @@ def index(request):
     			fcntl.flock(fp,fcntl.LOCK_EX)
     			url = 'http://'+SecondaryServerIP
     			r = requests.post(url,data = jobs, proxies= proxyDict)
-		else:
+		elif From == 'Web': #for handling web request
 			# ipAddrOfPOST = str(request.META['REMOTE_ADDR'])
 			#save timestamp of post
 			# Save the file sent
@@ -95,11 +95,18 @@ def index(request):
 				jobs[jobid] = job
 				fp.seek(0)
 				json.dump(jobs, fp)
-				fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock		
-		return HttpResponse(jobid) #check 
+				fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock	
+			# wait to send response until job is complete	
+			###### Send to tejas's server
+			return HttpResponse(jobid) #check 
+		elif From == 'Server':
+
+
+
+
 	elif request.method == 'GET':		
-		username = request.GET.__getitem__('username')
-		Jobid = request.GET.__getitem__('Jobid')
+		username = request.META['HTTP_USERNAME']
+		Jobid = request.META['HTTP_JOBID']
 		data = loadFromJson(dirWhereItWillSave+jobFile)
 		JobStatus = data[Jobid][4]
 		Output = data[Jobid][5]
