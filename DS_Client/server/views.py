@@ -78,7 +78,7 @@ def index(request):
 
 		# psutil calls
 		virtualMemory = str(psutil.virtual_memory())
-		swapMemory = str(psutil.swap_memory())
+		# swapMemory = str(psutil.swap_memory())
 
 		# co = request.META['HTTP_COMMAND']
 		# print co
@@ -90,8 +90,8 @@ def index(request):
 
 		# Write to file
 		fileToSend = open(filename,"w+")
-		fileToSend.write(virtualMemory + "\n")
-		fileToSend.write(swapMemory + "\n")
+		fileToSend.write(virtualMemory)
+		# fileToSend.write(swapMemory + "\n")
 		fileToSend.close()
 
 		# Send file as HttpResponse		
