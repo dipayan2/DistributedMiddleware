@@ -19,8 +19,10 @@ from subprocess import Popen, PIPE
 @csrf_exempt
 def index(request):
 
-	dirWhereItWillExec = '/home/samprit/Desktop/DS'
-	dirOfCleintPOSTFile = '/home/samprit/Desktop/DS/Distributed-Systems-Project/'
+	# dirWhereItWillExec = '/home/samprit/Desktop/DS'
+	# dirOfCleintPOSTFile = '/home/samprit/Desktop/DS/Distributed-Systems-Project/'
+	dirWhereItWillExec = os.getcwd() + '/'
+	dirOfCleintPOSTFile = os.getcwd() + '/'
 
 	if request.method == 'POST':
 
@@ -74,8 +76,13 @@ def index(request):
 		virtualMemory = str(psutil.virtual_memory())
 		swapMemory = str(psutil.swap_memory())
 
+		# co = request.META['HTTP_COMMAND']
+		# print co
+		# print os.getcwd()
+
 		# File to write data for psutil
-		filename = dirWhereItWillExec + "GET_file.txt";
+		# filename = dirWhereItWillExec + "GET_file.txt";
+		filename = dirOfCleintPOSTFile + "GET_file.txt"
 
 		# Write to file
 		fileToSend = open(filename,"w+")

@@ -1,5 +1,6 @@
 import fcntl
 import json
+import os
 
 users = {'admin':'admin123'}
 ListofIP = ["localhost:8001"]
@@ -8,8 +9,10 @@ PrimIP = "10.5.30.143:8001"
 MainServerIP = "http://localhost:8000"
 SecondaryServerIP = "http://localhost:8001"
 
-psutilFile = "/home/dipayan/Desktop/Distributed-Systems-Project/psutilFile.json"
-jobFile = "/home/dipayan/Desktop/Distributed-Systems-Project/jobFile.json"
+# psutilFile = "/home/dipayan/Desktop/Distributed-Systems-Project/psutilFile.json"
+# jobFile = "/home/dipayan/Desktop/Distributed-Systems-Project/jobFile.json"
+psutilFile = os.getcwd() + "/"
+jobFile = os.getcwd() + "/"
 
 def saveAsJson(data, filename):
 	if filename == "jobs":

@@ -1,0 +1,2 @@
+svmem(total=1034715136L, available=351674368L, percent=66.0, used=948461568L, free=86253568L, active=257990656, inactive=514342912, buffers=92262400L, cached=173158400)
+sswap(total=1071640576L, used=25620480L, free=1046020096L, percent=2.4, sin=3538944, sout=26853376)
