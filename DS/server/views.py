@@ -97,15 +97,17 @@ def index(request):
 				json.dump(jobs, fp)
 				fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock	
 			# wait to send response until job is complete	
-			###### Send to tejas's server
+			url = 'http://'+SecondaryServerIP
+			payload = {'From':'Server','ClientID':-1,'data':job,'Jobid':jobid}
+			r = request.POST(url , data = payload, proxies = proxyDict)
 			return HttpResponse(jobid) #check 
 		elif From == 'Server':
 			with open(dirWhereItWillSave+ jobFile, 'r+b') as fp:
 				jobs = json.load(fp)
-				ClientID = request.META['ClientID']
+				ClientID = int(request.POST.__getitem__['ClientID'])
 				if ClientID < 0:
-					jobid = request.META['Jobid']
-					jobdata = request.META['data']
+					jobid = int(request.POST.__getitem__['Jobid'])
+					jobdata = dict(request.POST)['data']
 					jobs[jobid] = jobdata
 				else:
 					for job in jobs:
@@ -115,14 +117,17 @@ def index(request):
 
 
 
-	elif request.method == 'GET':		
-		username = request.META['HTTP_USERNAME']
-		Jobid = request.META['HTTP_JOBID']
-		data = loadFromJson(dirWhereItWillSave+jobFile)
-		JobStatus = data[Jobid][4]
-		Output = data[Jobid][5]
-		ClientId = data[Jobid][1]
-		return HttpResponse(str(JobStatus)+":"+str(Output)+":"+str(ClientId)) #need to change
-	else:
+	elif request.method == 'GET':
+		if request.META['HTTP_FROM'] == 'Web':
+			username = request.META['HTTP_USERNAME']
+			Jobid = request.META['HTTP_JOBID']
+			data = loadFromJson(dirWhereItWillSave+jobFile)
+			JobStatus = data[Jobid][4]
+			Output = data[Jobid][5]
+			ClientId = data[Jobid][1]
+			return HttpResponse(str(JobStatus)+":"+str(Output)+":"+str(ClientId)) #need to change
+		elif request.META['HTTP_FROM'] == 'Server':
+			return HttpResponse("IamOK") 
+		else:
 		raise Http404
 		return HttpResponse("failed")

@@ -54,7 +54,9 @@ class Client_Failure(threading.Thread):
 			fp.seek(0)
 			json.dump(jobs, fp)
 			fcntl.flock(fp, fcntl.LOCK_UN) # waiting lock to be added
-
+			url = 'http://'+SecondaryServerIP
+			payload = {'From':'Server','ClientID':self.clientid}
+			r = requests.post(url,data=payload,proxies=proxyDict)
 
 
 LastClientUsed = 0
@@ -93,7 +95,7 @@ while True:
 			json.dump(DwJob,fp)
 			fcntl.flock(fp,fcntl.LOCK_UN)
 			url =  'http://'+SecondaryServerIP
-			payload = {'data': DwJob ,'From':'Server'}
+			payload = {'data': DwJob[pendingJobList[0]] ,'From':'Server','Jobid': pendingJobList[0],'ClientID': -1}
 			r = requests.post(url,data = payload,proxies= proxyDict)
 		del pendingJobList[0]
 	time.sleep(3)
