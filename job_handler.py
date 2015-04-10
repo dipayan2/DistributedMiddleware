@@ -8,10 +8,11 @@ from server_utils import *
 
 class Submit_Jobs(threading.Thread):
 	    
-	    def __init__(self, job, clientid):
+	    def __init__(self, job,jobid, clientid):
 	    	threading.Thread.__init__(self)
-	    	self.job = job
+	    	self.job = job     # this job is a list needs different handling
 	    	self.clientid = clientid
+	    	self.jobid = jobid
 	    
 	    def run(self):
 	    	urlc = "http://"+str(ListofIP[self.clientid])
@@ -19,12 +20,22 @@ class Submit_Jobs(threading.Thread):
 	    	filename = self.job[2]
 	    	payload = {'Command': command , 'Jobid' : self.job[0]}
 	    	files = {'file':open(filename,'rb')}
-	    	r = requests.post(url,files = files,data = payload, proxies = proxyDict)
-	    	#file should be locked
-	    	#read jobs from file
-	    	#write job back to job dict
-	    	# write back to the json file
-	    	# send it to sec server also
+	    	response = 1
+	    	r = requests.post(urlc,files = files,data = payload, proxies = proxyDict)
+	    	if r.status_code == requests.codes.ok:
+	    		response = 1
+	    	else:
+	    		response = 0
+	    	if response == 0:
+	    		with open(jobFile,'r+b') as fp:
+	    			fcntl.flock(fp,fcntl.LOCK_EX)
+	    			jobs = json.load(fp)
+	    			jobs[self.jobid][4] = 'failed'
+	    			jobs[self.jobid][1] = self.clientid
+	    			fcntl.flock(fp,fcntl.LOCK_EX)
+	    			url = 'http://'+SecondaryServerIP
+	    			r = requests.post(url,data = jobs, proxies= proxyDict)
+
 
 class Client_Failure(threading.Thread):
 
@@ -36,8 +47,8 @@ class Client_Failure(threading.Thread):
 			fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock to be added
 			jobs = json.load(fp)
 			for job in jobs:
-				if jobs[job][1] == self.clientid and jobs[job][4] == 'started':
-					jobs[job][4] = "failed"
+				if jobs[job][1] == self.clientid :
+					jobs[job][4] = "failed-request"
 			fp.seek(0)
 			json.dump(jobs, fp)
 			fcntl.flock(fp, fcntl.LOCK_UN) # waiting lock to be added
@@ -65,17 +76,23 @@ while True:
 			if Client[(ListofIP[(LastClientUsed+i) % NoClients]][0] > 15 MB:
 				LastClientUsed = (LastClientUsed+i) % NoClients
 				break
-		t = Submit_Jobs(pending_jobs[pendingJobList[0]], LastClientUsed)
+		t = Submit_Jobs(pending_jobs[pendingJobList[0]],pendingJobList[0], LastClientUsed)
 		t. start()
-		#This modifies the json file of job
-		# lock the file
-		# download the file 
+		
 		del pending_jobs[pendingJobList[0]]
-		jobs[pendingJobList[0]][4] = 'started'
-		jobs[pendingJobList[0]][1] = clientid
+		with open(jobFile,'r+b') as fp:
+			fcntl.flock(fp,fcntl.LOCK_EX)
+			DwJob = json.load(fp)
+			if DwJob[pendingJobList[0]][4] == 'failed-request':
+				DwJob[pendingJobList[0]][4] == 'failed'
+			else:
+				DwJob[pendingJobList[0]][4] == 'started'
+				DwJob[pendingJobList[0]][1] = LastClientUsed
+			json.dump(DwJob,fp)
+			fcntl.flock(fp,fcntl.LOCK_UN)
+			url =  'http://'+SecondaryServerIP
+			r = requests.post(url,data = DwJob,proxies= proxyDict)
 		del pendingJobList[0]
-		saveAsJson(jobs,"jobs")
-		# unlock the file
 	time.sleep(3)
 
 

@@ -15,61 +15,81 @@ from server_utils import *
 
 import psutil
 
+users = {'admin':'admin123'}
+ListofIP = ["localhost:8001"]
+PrimIP = "10.5.30.143:8001"
+
+MainServerIP = "http://localhost:8000"
+SecondaryServerIP = "http://localhost:8001"
+
 @csrf_exempt
 
-def retrieve_Job():
-	dirWhereItWillSave = ''
+dirWhereItWillSave = '/home/subham/DS/'
+
+def retrieve_Job(username,filename,command):
+	# dirWhereItWillSave = ''
 	#retrieve the filename, command, outputfilename, username
-	job = [username, -1, dirWhereItWillSave + filename, command, 'pending', outputfilename]
+	job = [username, -1, dirWhereItWillSave + filename, command, 'pending', '']
 	return job
 
 def index(request):
 
-	dirWhereItWillSave = '/home/subham/DS/'
-	name = 'jobidname.txt'
+	Jname = 'jobidname.txt' #should be created beforehand
 	jobFile = 'jobFile.json'
 
+	# here we need to handle different POST whether from client or Web
 	if request.method == 'POST':
-		ipAddrOfPOST = str(request.META['REMOTE_ADDR'])
-		#save timestamp of post
-		# Save the file sent
-		for filename, file in request.FILES.iteritems():
-			name = request.FILES[filename].name
-			fileToSave = request.FILES[filename]
-			with open(dirWhereItWillSave + name, 'wb+') as destination:
-				for chunk in fileToSave.chunks():
-					destination.write(chunk)
-
-		#read virtual and swap memories
-		fileReceived = open(dirWhereItWillSave + name, "r+")
-		virtualMemory, swapMemory = fileReceived.read().split('\n')[0:2]
-		fileReceived.close()
-		jobid = 0
-		## Function of reading and writing in file
-		with open(dirWhereItWillSave+name,'r+') as fp:
-			fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock to be implemented
-			data = fp.read()
-			jobid = int(data)+1
-			fp.seek(0)
-			fp.write(jobid)
-			fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock to be implemented
-		job = retrieve_Job()
-		with open(dirWhereItWillSave+ jobFile, 'r+b') as fp:
-			fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock
-			jobs = json.load(fp)
-			jobs[jobid] = job
-			fp.seek(0)
-			json.dump(jobs, fp)
-			fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock
-
-
-
-
-
-		
+		From = request.POST.__getitem__('From')
+		if From == 'Client':
+			Output = request.POST.__getitem__('Output')
+			JobStatus = request.POST.__getitem__('JobStatus')
+			Jobid = request.POST.__getitem__('Jobid')
+			with open(dirWhereItWillSave+jobFile,'r+b') as fp:
+    			fcntl.flock(fp,fcntl.LOCK_EX)
+    			jobs = json.load(fp)
+    			jobs[Jobid][4] = JobStatus
+    			jobs[Jobid][5] = Output
+    			# jobs[self.][1] = self.clientid
+    			fcntl.flock(fp,fcntl.LOCK_EX)
+    			url = 'http://'+SecondaryServerIP
+    			r = requests.post(url,data = jobs, proxies= proxyDict)
+		else:
+			# ipAddrOfPOST = str(request.META['REMOTE_ADDR'])
+			#save timestamp of post
+			# Save the file sent
+			username = request.POST.__getitem__('username')
+			Command = request.POST.__getitem__('Command')
+			name = ''
+			# inputfilename = request.POST.__getitem__('inputfilename')
+			for filename, file in request.FILES.iteritems():
+				name = request.FILES[filename].name
+				fileToSave = request.FILES[filename]
+				with open(dirWhereItWillSave + name, 'wb+') as destination:
+					for chunk in fileToSave.chunks():
+						destination.write(chunk)
+			# #read virtual and swap memories
+			# fileReceived = open(dirWhereItWillSave + name, "r+")
+			# virtualMemory, swapMemory = fileReceived.read().split('\n')[0:2]
+			# fileReceived.close()
+			jobid = 0
+			## Function of reading and writing in file
+			with open(dirWhereItWillSave+Jname,'r+') as fp:
+				fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock to be implemented
+				data = fp.read()
+				jobid = int(data)+1
+				fp.seek(0)
+				fp.write(jobid)
+				fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock to be implemented
+			job = retrieve_Job(username,name,Command)
+			with open(dirWhereItWillSave+ jobFile, 'r+b') as fp:
+				fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock
+				jobs = json.load(fp)
+				jobs[jobid] = job
+				fp.seek(0)
+				json.dump(jobs, fp)
+				fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock		
 		return HttpResponse("Got POST")
-	elif request.method == 'GET':
-		
+	elif request.method == 'GET':		
 		print request
 		return HttpResponse("Sec Server is alive")
 	else:

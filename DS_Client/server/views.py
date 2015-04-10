@@ -14,6 +14,8 @@ import psutil
 
 from subprocess import Popen, PIPE
 
+
+#@samprit: while posting finished job, pls send the jobid too
 @csrf_exempt
 def index(request):
 

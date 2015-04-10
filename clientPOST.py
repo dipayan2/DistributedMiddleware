@@ -21,6 +21,7 @@ def runFile(dirWhereItWillExec, commandList):
 	dataToSend = {}
 	dataToSend['From'] = 'Client'
 	dataToSend['Output'] = output
+	dataToSend['JobStatus'] = 'finished'
 
 	# Send POST
 	# headerType = {'content-type': 'application/x-www-form-urlencoded'}
