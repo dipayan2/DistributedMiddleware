@@ -26,6 +26,14 @@ SecondaryServerIP = "http://localhost:8001"
 
 dirWhereItWillSave = '/home/subham/DS/'
 
+def loadFromJson(filename):
+	with open(filename, 'rb') as fp:
+	#waiting lock here
+		fcntl.flock(fp, fcntl.LOCK_EX)
+		data = json.load(fp)
+		fcntl.flock(fp, fcntl.LOCK_UN)
+	return data
+
 def retrieve_Job(username,filename,command):
 	# dirWhereItWillSave = ''
 	#retrieve the filename, command, outputfilename, username
@@ -88,10 +96,15 @@ def index(request):
 				fp.seek(0)
 				json.dump(jobs, fp)
 				fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock		
-		return HttpResponse("Got POST")
+		return HttpResponse(jobid) #check 
 	elif request.method == 'GET':		
-		print request
-		return HttpResponse("Sec Server is alive")
+		username = request.GET.__getitem__('username')
+		Jobid = request.GET.__getitem__('Jobid')
+		data = loadFromJson(dirWhereItWillSave+jobFile)
+		JobStatus = data[Jobid][4]
+		Output = data[Jobid][5]
+		ClientId = data[Jobid][1]
+		return HttpResponse(str(JobStatus)+":"+str(Output)+":"+str(ClientId)) #need to change
 	else:
 		raise Http404
 		return HttpResponse("failed")
