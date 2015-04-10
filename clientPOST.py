@@ -7,7 +7,7 @@ from subprocess import Popen, PIPE
 
 
 # Run the file and send a POST
-def runFile(dirWhereItWillExec, commandList):
+def runFile(dirWhereItWillExec, commandList, jobID):
 	process = Popen(commandList, stdout=PIPE, cwd = dirWhereItWillExec)
 	(output, err) = process.communicate()
 	exit_code = process.wait()
@@ -22,6 +22,7 @@ def runFile(dirWhereItWillExec, commandList):
 	dataToSend['From'] = 'Client'
 	dataToSend['Output'] = output
 	dataToSend['JobStatus'] = 'finished'
+	dataToSend['Jobid'] = jobID
 
 	# Send POST
 	# headerType = {'content-type': 'application/x-www-form-urlencoded'}
@@ -39,16 +40,18 @@ def runFile(dirWhereItWillExec, commandList):
 
 # Takes input from the commandLine
 # First argument is the directory where the file is stored
+# Second argument is the jobID
 # Rest of the arguments specify how to run the file
 def main():
 
 	dirWhereItWillExec = sys.argv[1]
+	jobID = sys.argv[2]
 	commandList = []
 
-	for arg in xrange(2,len(sys.argv)):
+	for arg in xrange(3,len(sys.argv)):
 		commandList.append(sys.argv[arg])
 
-	runFile(dirWhereItWillExec, commandList)
+	runFile(dirWhereItWillExec, commandList, jobID)
 
 
 if __name__ == '__main__':

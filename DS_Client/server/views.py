@@ -46,10 +46,15 @@ def index(request):
 		# print commandList
 
 
+		# Get Jobid
+		jobID = request.POST.__getitem__('Jobid')
+
+
 		command = []
 		command.append("python")
 		command.append("clientPOST.py")
 		command.append(dirWhereItWillExec)
+		command.append(jobID)
 		command.extend(commandList)
 		# print command
 
