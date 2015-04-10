@@ -14,6 +14,7 @@ import json
 from server_utils import *
 
 import psutil
+import sys, inspect
 
 users = {'admin':'admin123'}
 ListofIP = ["localhost:8001"]
@@ -24,7 +25,11 @@ SecondaryServerIP = "http://localhost:8001"
 
 @csrf_exempt
 
-dirWhereItWillSave = '/home/subham/DS/'
+# dirWhereItWillSave = '/home/subham/DS/'
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+parentdir = os.path.dirname(parentdir)
+dirWhereItWillSave = parentdir
 
 def loadFromJson(filename):
 	with open(filename, 'rb') as fp:

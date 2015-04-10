@@ -77,7 +77,7 @@ while True:
 				FailedID = (LastClientUsed+ i) % NoClients
 				c = Client_Failure(FailedID)
 				c.start()
-			if Client[(ListofIP[(LastClientUsed+i) % NoClients]][0] > 15 MB:
+			if Client[(ListofIP[(LastClientUsed+i) % NoClients]] > 15000000:
 				LastClientUsed = (LastClientUsed+i) % NoClients
 				break
 		t = Submit_Jobs(pending_jobs[pendingJobList[0]],pendingJobList[0], LastClientUsed)

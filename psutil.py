@@ -25,9 +25,12 @@ def SendGet():
 		# Addr = "http://localhost:8001"
 		try:
 			r = requests.get(Addr, proxies = proxyDict, timeout = (connect_timeout, read_timeout))
-			responseArr[Addr] = r.content
+			mem_data = r.content
+			mem = mem_data.split("free=")[1]
+			mem = mem.split("L")[0]
+			responseArr[Addr] = int(mem)
 		except requests.exceptions.ConnectTimeout as e:
-			responseArr[Addr] = "Client Failed"
+			responseArr[Addr] = -1
 
 
 	# with open(psutilFile, "w+") as g:
