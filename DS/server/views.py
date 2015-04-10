@@ -23,7 +23,7 @@ PrimIP = "10.5.30.143:8001"
 MainServerIP = "http://localhost:8000"
 SecondaryServerIP = "http://localhost:8001"
 
-@csrf_exempt
+
 
 # dirWhereItWillSave = '/home/subham/DS/'
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -45,6 +45,7 @@ def retrieve_Job(username,filename,command):
 	job = [username, -1, dirWhereItWillSave + filename, command, 'pending', '']
 	return job
 
+@csrf_exempt
 def index(request):
 
 	Jname = 'jobidname.txt' #should be created beforehand

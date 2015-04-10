@@ -3,10 +3,10 @@ import json
 import os
 
 users = {'admin':'admin123'}
-ListofIP = ["192.168.85.138:8000"]
+ListofIP = ["localhost:8005"]
 PrimIP = "10.5.30.143:8001"
 
-MainServerIP = "http://localhost:8000"
+MainServerIP = "http://localhost:8004"
 SecondaryServerIP = "http://localhost:8001"
 
 # psutilFile = "/home/dipayan/Desktop/Distributed-Systems-Project/psutilFile.json"
@@ -21,7 +21,7 @@ def saveAsJson(data, filename):
 		files = psutilFile
 	# waiting lock here
 	print files
-	with open(files, 'wb') as fp:
+	with open(files, 'w+') as fp:
 		fcntl.flock(fp, fcntl.LOCK_EX)
 		json.dump(data, fp)
 		fcntl.flock(fp, fcntl.LOCK_UN)
@@ -32,13 +32,16 @@ def loadFromJson(filename):
 			files = jobFile
 		elif filename == "psutil":
 			files = psutilFile
-		with open(files, 'rb') as fp:
+		print files
+		with open(files, 'r+') as fp:
 		#waiting lock here
+			print "blabla"
 			fcntl.flock(fp, fcntl.LOCK_EX)
 			data = json.load(fp)
 			fcntl.flock(fp, fcntl.LOCK_UN)
 		return data
 	except Exception, e:
+		print e
 		return {}
 	
 

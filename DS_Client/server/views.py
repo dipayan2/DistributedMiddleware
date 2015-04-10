@@ -62,7 +62,7 @@ def index(request):
 		command.append(dirWhereItWillExec)
 		command.append(jobID)
 		command.extend(commandList)
-		# print command
+		print command
 
 		# Run the process
 		process = Popen(command, stdout=PIPE, cwd = dirOfCleintPOSTFile)

@@ -1,10 +1,4 @@
-import os,sys,inspect
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-parentdir = os.path.dirname(parentdir)
-sys.path.insert(0,parentdir)
-
-from data import *
+# NEED CHANGE MASSIVE
 
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
@@ -13,6 +7,7 @@ from django.http import Http404
 
 import requests
 import time
+import os
 import fcntl
 import json
 
@@ -28,13 +23,33 @@ PrimIP = "10.5.30.143:8001"
 MainServerIP = "http://localhost:8000"
 SecondaryServerIP = "http://localhost:8001"
 
+@csrf_exempt
+
 # dirWhereItWillSave = '/home/subham/DS/'
-dirWhereItWillSave = parentdir + "/"
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+parentdir = os.path.dirname(parentdir)
+dirWhereItWillSave = parentdir
+
+def loadFromJson(filename):
+	with open(filename, 'rb') as fp:
+	#waiting lock here
+		fcntl.flock(fp, fcntl.LOCK_EX)
+		data = json.load(fp)
+		fcntl.flock(fp, fcntl.LOCK_UN)
+	return data
+
+def retrieve_Job(username,filename,command):
+	# dirWhereItWillSave = ''
+	#retrieve the filename, command, outputfilename, username
+	job = [username, -1, dirWhereItWillSave + filename, command, 'pending', '']
+	return job
 
 @csrf_exempt
 def index(request):
-	# print "kansdkjndskfj"
-	Jname = 'jobidname.json' #should be created beforehand
+
+
+	Jname = 'jobidname.txt' #should be created beforehand
 	jobFile = 'jobFile.json'
 
 	# here we need to handle different POST whether from client or Web
@@ -44,28 +59,15 @@ def index(request):
 			Output = request.POST.__getitem__('Output')
 			JobStatus = request.POST.__getitem__('JobStatus')
 			Jobid = request.POST.__getitem__('Jobid')
-			print Jobid, Output
-			print dirWhereItWillSave,jobFile
-			with open(dirWhereItWillSave+jobFile,'r+') as fp:
-				fcntl.flock(fp,fcntl.LOCK_EX)
-				jobs = {}
-				try:
-					jobs = json.load(fp)
-					jobs[Jobid][4] = JobStatus
-					jobs[Jobid][5] = Output
-				except Exception, e:
-					jobs = {}
-				fp.truncate()
-				fp.seek(0)
-				json.dump(jobs,fp)
-				# jobs[self.][1] = self.clientid
-				fcntl.flock(fp,fcntl.LOCK_UN)
-			url = 'http://'+SecondaryServerIP
-			try:
-				r = requests.post(url,data = jobs, proxies= proxyDict)
-			except Exception, e:
-				print "SecondaryServer not working"
-			return HttpResponse("OK")
+			with open(dirWhereItWillSave+jobFile,'r+b') as fp:
+    			fcntl.flock(fp,fcntl.LOCK_EX)
+    			jobs = json.load(fp)
+    			jobs[Jobid][4] = JobStatus
+    			jobs[Jobid][5] = Output
+    			# jobs[self.][1] = self.clientid
+    			fcntl.flock(fp,fcntl.LOCK_EX)
+    			url = 'http://'+SecondaryServerIP
+    			r = requests.post(url,data = jobs, proxies= proxyDict)
 		elif From == 'Web': #for handling web request
 			# ipAddrOfPOST = str(request.META['REMOTE_ADDR'])
 			#save timestamp of post
@@ -84,55 +86,31 @@ def index(request):
 			# fileReceived = open(dirWhereItWillSave + name, "r+")
 			# virtualMemory, swapMemory = fileReceived.read().split('\n')[0:2]
 			# fileReceived.close()
-			print username
-			jobid = -1
+			jobid = 0
 			## Function of reading and writing in file
-			print dirWhereItWillSave,Jname
 			with open(dirWhereItWillSave+Jname,'r+') as fp:
 				fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock to be implemented
-				data = {}
-				try:
-					data = json.load(fp)
-				except Exception, e:
-					data["Jobid"] = "-1"
-				jobid = int(data["Jobid"])+1
-				data["Jobid"] = jobid
-				fp.truncate()
+				data = fp.read()
+				jobid = int(data)+1
 				fp.seek(0)
-				json.dump(data, fp)
+				fp.write(jobid)
 				fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock to be implemented
 			job = retrieve_Job(username,name,Command)
-			#print jobid
-			with open(dirWhereItWillSave+ jobFile, 'r+') as fp:
+			with open(dirWhereItWillSave+ jobFile, 'w+') as fp:
 				fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock
-				jobs = {}
-				try:
-					jobs = json.load(fp)
-				except Exception, e:
-					jobs = {}
-				#print jobs
+				jobs = json.load(fp)
 				jobs[jobid] = job
-				fp.truncate()
 				fp.seek(0)
 				json.dump(jobs, fp)
 				fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock	
 			# wait to send response until job is complete	
-			#print jobs
 			url = 'http://'+SecondaryServerIP
 			payload = {'From':'Server','ClientID':-1,'data':job,'Jobid':jobid}
-			try:
-				r = request.POST(url , data = payload, proxies = proxyDict)
-			except Exception, e:
-				print "SecondaryServer not working"
-			
+			r = request.POST(url , data = payload, proxies = proxyDict)
 			return HttpResponse(jobid) #check 
 		elif From == 'Server':
-			with open(dirWhereItWillSave+ jobFile, 'r+') as fp:
-				jobs = {}
-				try:
-					jobs = json.load(fp)
-				except Exception, e:
-					jobs = {}
+			with open(dirWhereItWillSave+ jobFile, 'w+') as fp:
+				jobs = json.load(fp)
 				ClientID = int(request.POST.__getitem__['ClientID'])
 				if ClientID < 0:
 					jobid = int(request.POST.__getitem__['Jobid'])
@@ -141,14 +119,13 @@ def index(request):
 				else:
 					for job in jobs:
 						if jobs[job][1] == Clientid and jobs[job][4] == "started" :
-							jobs[job][4] = "failed"
-				fp.truncate()
-				fp.seek(0)
+						jobs[job][4] = "failed"
 				json.dump(jobs,fp)
 
 
 
 	elif request.method == 'GET':
+		print "inside"
 		if request.META['HTTP_FROM'] == 'Web':
 			username = request.META['HTTP_USERNAME']
 			Jobid = request.META['HTTP_JOBID']
@@ -163,12 +140,5 @@ def index(request):
 		elif request.META['HTTP_FROM'] == 'Server':
 			return HttpResponse("IamOK") 
 		else:
-			raise Http404
-			return HttpResponse("failed")
-
-
-def retrieve_Job(username,filename,command):
-	# dirWhereItWillSave = ''
-	#retrieve the filename, command, outputfilename, username
-	job = [username, -1, dirWhereItWillSave + filename, command, 'pending', '']
-	return job
+		raise Http404
+		return HttpResponse("failed")

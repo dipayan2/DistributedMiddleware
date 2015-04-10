@@ -15,10 +15,11 @@ class Submit_Jobs(threading.Thread):
 	    	self.jobid = jobid
 	    
 	    def run(self):
+	    	print "Submitting"
 	    	urlc = "http://"+str(ListofIP[self.clientid])
 	    	command = self.job[3]
 	    	filename = self.job[2]
-	    	payload = {'Command': command , 'Jobid' : self.job[0]}
+	    	payload = {'Command': command , 'Jobid' : self.jobid}
 	    	files = {'file':open(filename,'rb')}
 	    	response = 1
 	    	r = requests.post(urlc,files = files,data = payload, proxies = proxyDict)
@@ -27,12 +28,15 @@ class Submit_Jobs(threading.Thread):
 	    	else:
 	    		response = 0
 	    	if response == 0:
-	    		with open(jobFile,'w+') as fp:
+	    		with open(jobFile,'r+') as fp:
 	    			fcntl.flock(fp,fcntl.LOCK_EX)
 	    			jobs = json.load(fp)
 	    			jobs[self.jobid][4] = 'failed-request'
 	    			jobs[self.jobid][1] = self.clientid
-	    			fcntl.flock(fp,fcntl.LOCK_EX)
+	    			fp.truncate()
+	    			fp.seek(0)
+	    			json.dump(jobs,fp)
+	    			fcntl.flock(fp,fcntl.LOCK_UN)
 	    			url = 'http://'+SecondaryServerIP
 	    			payload = {'data' : jobs[self.jobid] , 'From' : 'Server','Jobid' : self.jobid , 'ClientID' : -1} # for secondary server to know who sent it need to change in the secondary server server part
 	    			# ClientID = -1 means no client failure, otherwise it means the given ID has failed
@@ -45,12 +49,13 @@ class Client_Failure(threading.Thread):
 		threading.Thread.__init__(self)
 		self.clientid = clientid
 	def run(self):
-		with open(jobFile, 'w+') as fp:
+		with open(jobFile, 'r+') as fp:
 			fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock to be added
 			jobs = json.load(fp)
 			for job in jobs:
 				if jobs[job][1] == self.clientid and jobs[job][4] == "started" :
 					jobs[job][4] = "failed"
+			fp.truncate()
 			fp.seek(0)
 			json.dump(jobs, fp)
 			fcntl.flock(fp, fcntl.LOCK_UN) # waiting lock to be added
@@ -60,43 +65,60 @@ class Client_Failure(threading.Thread):
 
 
 LastClientUsed = 0
-NoClients = 1 # TO BE CHANGED
+#NoClients = 1 # TO BE CHANGED
 # Should constantly loop arouund to find whether there is any pending job and send it to a client
 while True:
+	print "JobHandler"
+	print "Jobs"
 	jobs = loadFromJson("jobs")
+	print jobs
 	pending_jobs = {}
 	pendingJobList = []
 	for job in jobs:
+		print "Within"
+		print job
 		if jobs[job][4] == 'pending' or jobs[job][4] == 'failed':
 			pending_jobs[job] = jobs[job]
 			pendingJobList.append(job)
+	print pendingJobList
+	print pending_jobs
 	if any(pending_jobs):
+		print "Changing jobs"
 		Client = loadFromJson("psutil")
+		NoClients = len(ListofIP)
+
 		for i in xrange(0,NoClients):
-			if Client[ListofIP[(LastClientUsed+i)% NoClients]][0] == -1:
+			if int(Client["http://"+str(ListofIP[(int(LastClientUsed)+int(i))% int(NoClients)])]) == -1:
 				FailedID = (LastClientUsed+ i) % NoClients
 				c = Client_Failure(FailedID)
 				c.start()
-			if Client[ListofIP[(LastClientUsed+i) % NoClients]] > 15000000:
+			if int(Client["http://"+str(ListofIP[(int(LastClientUsed)+int(i)) % int(NoClients)])]) > 15000000:
 				LastClientUsed = (LastClientUsed+i) % NoClients
 				break
 		t = Submit_Jobs(pending_jobs[pendingJobList[0]],pendingJobList[0], LastClientUsed)
-		t. start()
+		t.start()
+		print "Job Submitted"
 		
 		del pending_jobs[pendingJobList[0]]
-		with open(jobFile,'w+') as fp:
+		with open(jobFile,'r+') as fp:
 			fcntl.flock(fp,fcntl.LOCK_EX)
 			DwJob = json.load(fp)
 			if DwJob[pendingJobList[0]][4] == 'failed-request':
-				DwJob[pendingJobList[0]][4] == 'failed'
+				DwJob[pendingJobList[0]][4] = 'failed'
 			else:
-				DwJob[pendingJobList[0]][4] == 'started'
+				DwJob[pendingJobList[0]][4] = 'started'
 				DwJob[pendingJobList[0]][1] = LastClientUsed
+			fp.truncate()
+			fp.seek(0)
 			json.dump(DwJob,fp)
 			fcntl.flock(fp,fcntl.LOCK_UN)
 			url =  'http://'+SecondaryServerIP
 			payload = {'data': DwJob[pendingJobList[0]] ,'From':'Server','Jobid': pendingJobList[0],'ClientID': -1}
-			r = requests.post(url,data = payload,proxies= proxyDict)
+			try:
+				r = requests.post(url,data = payload,proxies= proxyDict)
+			except Exception, e:
+				print "SecondaryServer not workng"
+			
 		del pendingJobList[0]
 	time.sleep(3)
 
