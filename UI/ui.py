@@ -51,12 +51,12 @@ while True:
 			flag = 1
 			print r.status_code
 			print "PRIMARY HAS FAILED"
-		# url = 'http://'+SecondaryServerIP
-		# r = requests.post(url,files = files,data = payload, proxies= proxyDict)
-		# if r.status_code == requests.codes.ok:
-		# 	print "SecondaryServer FAILED"	
-		# if flag == 1:
-		# 	print r.content
+		url = 'http://'+SecondaryServerIP
+		r = requests.post(url,files = files,data = payload, proxies= proxyDict)
+		if r.status_code == requests.codes.ok:
+			print "SecondaryServer Sent"	
+		if flag == 1:
+			print r.content
 	elif words[0] == 'status':
 		jobid = int(words[1])
 		url = 'http://'+PrimIP

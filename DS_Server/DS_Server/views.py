@@ -40,15 +40,18 @@ def index(request):
 	Jname = 'jobidname.json' #should be created beforehand
 	jobFile = 'jobFile.json'
 
+	# print "gergregfregtrgtr"
 	# here we need to handle different POST whether from client or Web
 	if request.method == 'POST':
-		print "Posting"
+		print "Posting1"
 		From = request.POST.__getitem__('From')
+		print "From :",From
 		if From == 'Client':
+			print "Client"
 			Output = request.POST.__getitem__('Output')
 			JobStatus = request.POST.__getitem__('JobStatus')
 			Jobid = request.POST.__getitem__('Jobid')
-			print Jobid, Output
+			print Jobid, Output, "Client"
 			print dirWhereItWillSave,jobFile
 			with open(lockFile,'w+') as lf:
 				fcntl.flock(lf,fcntl.LOCK_EX)
@@ -68,9 +71,12 @@ def index(request):
 					fcntl.flock(fp,fcntl.LOCK_UN)
 				fcntl.flock(lf,fcntl.LOCK_UN)
 			url = 'http://'+SecondaryServerIP
+			payload= {'From':'Server','Jobid' : Jobid,'data' : jobs[Jobid],'ClientID' : -1}
+			print url
 			try:
-				r = requests.post(url,data = jobs, proxies= proxyDict)
+				r = requests.post(url,data = payload, proxies= proxyDict)
 			except Exception, e:
+				print e
 				print "SecondaryServer not working"
 			return HttpResponse("OK")
 		elif From == 'Web': #for handling web request
@@ -138,12 +144,13 @@ def index(request):
 				fcntl.flock(lf,fcntl.LOCK_UN)
 			# wait to send response until job is complete	
 			#print jobs
-			url = 'http://'+SecondaryServerIP
-			payload = {'From':'Server','ClientID':-1,'data':job,'Jobid':jobid}
-			try:
-				r = request.POST(url , data = payload, proxies = proxyDict)
-			except Exception, e:
-				print "SecondaryServer not working"
+			# url = 'http://'+SecondaryServerIP
+			# print url
+			# payload = {'From':'Server','ClientID':-1,'data':job,'Jobid':jobid}
+			# try:
+			# 	r = request.POST(url , data = payload, proxies = proxyDict)
+			# except Exception, e:
+			# 	print "SecondaryServer not working"
 			
 			return HttpResponse(jobid) #check 
 		elif From == 'Server':
@@ -154,9 +161,9 @@ def index(request):
 					jobs = json.load(fp)
 				except Exception, e:
 					jobs = {}
-				ClientID = int(request.POST.__getitem__['ClientID'])
+				ClientID = int(request.POST.__getitem__('ClientID'))
 				if ClientID < 0:
-					jobid = str(request.POST.__getitem__['Jobid'])
+					jobid = str(request.POST.__getitem__('Jobid'))
 					jobdata = dict(request.POST)['data']
 					jobs[jobid] = jobdata
 				else:
