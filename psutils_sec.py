@@ -11,27 +11,29 @@ import fcntl
 import json
 
 from data import *
+from job_handler_sec import *
 
-# to store the nodes which are not working
-connect_timeout = 1.0
-read_timeout = 0.05
+run_sec = 0
 # need to format the output
 def SendGet():
 	# This code will send get requests to all clients
 	threading.Timer(10.0,SendGet).start()
 	responseArr = {}
-	for Ip in getListofIP():
-		Addr = "http://"+str(Ip)
-		# Addr = "http://localhost:8001"
-		try:
-			r = requests.get(Addr, proxies = proxyDict, timeout = connect_timeout)
-			mem_data = r.content
-			mem = mem_data.split("free=")[1]
-			mem = mem.split("L")[0]
-			print "running"
-			responseArr[Addr] = int(mem)
-		except Exception, e:
-			responseArr[Addr] = -1
+	if global run_sec == 1: 
+		for Ip in getListofIP():
+			Addr = "http://"+str(Ip)
+			print Addr
+			# Addr = "http://localhost:8001"
+			try:
+				r = requests.get(Addr, proxies = proxyDict, timeout = connect_timeout)
+				mem_data = r.content
+				mem = mem_data.split("free=")[1]
+				mem = mem.split("L")[0]
+				print "running"
+				responseArr[Addr] = int(mem)
+			except Exception, e:
+				print e
+				responseArr[Addr] = -1
 
 
 	# with open(psutilFile, "w+") as g:
