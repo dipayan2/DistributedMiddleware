@@ -148,6 +148,7 @@ def handle_jobs_sec():
 				print "ID Submitted", pendingJobList[0]
 				print "-------------------------"
 				del pending_jobs[pendingJobList[0]]
+				DwJob = {}
 				with open(lockFile,'w+') as lf:
 					fcntl.flock(lf,fcntl.LOCK_EX)
 					with open(jobFile,'r+') as fp:
@@ -179,7 +180,7 @@ def handle_jobs_sec():
 				print "trying to delete"
 				del pendingJobList[0]
 				print "deleted...."
-			time.sleep(3)
+			time.sleep(1)
 
 
 

@@ -105,6 +105,7 @@ def index(request):
 				except Exception, e:
 					data["Jobid"] = "-1"
 				jobid = int(data["Jobid"])+1
+				jobid = str(jobid)
 				data["Jobid"] = jobid
 				fp.truncate(0)
 				fp.seek(0)
@@ -155,7 +156,7 @@ def index(request):
 					jobs = {}
 				ClientID = int(request.POST.__getitem__['ClientID'])
 				if ClientID < 0:
-					jobid = int(request.POST.__getitem__['Jobid'])
+					jobid = str(request.POST.__getitem__['Jobid'])
 					jobdata = dict(request.POST)['data']
 					jobs[jobid] = jobdata
 				else:

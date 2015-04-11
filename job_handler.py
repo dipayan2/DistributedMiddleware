@@ -12,7 +12,7 @@ class Submit_Jobs(threading.Thread):
 	    	threading.Thread.__init__(self)
 	    	self.job = job     # this job is a list needs different handling
 	    	self.clientid = clientid
-	    	self.jobid = jobid
+	    	self.jobid = str(jobid)
 	    
 	    def run(self):
 	    	# print "Submitting"
@@ -34,8 +34,8 @@ class Submit_Jobs(threading.Thread):
 	    	except Exception, e:
 	    		response = 0
 	    	# print "cnsdkjfnj"
-	    	jobs = {}
 	    	if response == 0:
+	    		jobs = {}
 	    		with open(lockFile,'w+') as lf:
 	    			fcntl.flock(lf,fcntl.LOCK_EX)
 	    			with open(jobFile,'r+') as fp:
@@ -45,6 +45,7 @@ class Submit_Jobs(threading.Thread):
 	    				jobs = json.load(fp)
 	    				print "Jobs For Submitting Error"
 	    				# print jobs
+	    				print self.jobid
 	    				jobs[self.jobid][4] = 'failed-request'
 	    				jobs[self.jobid][1] = self.clientid
 	    				fp.truncate(0)
@@ -53,20 +54,21 @@ class Submit_Jobs(threading.Thread):
 	    				fcntl.flock(fp,fcntl.LOCK_UN)
 	    				# print "lock released 1"
 	    			fcntl.flock(lf,fcntl.LOCK_UN)
-	    	url = 'http://'+SecondaryServerIP
-	    	payload = {'data' : jobs[self.jobid] , 'From' : 'Server','Jobid' : self.jobid , 'ClientID' : -1} # for secondary server to know who sent it need to change in the secondary server server part
-	    	# ClientID = -1 means no client failure, otherwise it means the given ID has failed
-	    	try:
-	    		ro = requests.post(url,data = payload, proxies= proxyDict, timeout = connect_timeout) # can send only the jobs to reduce the messages
-	    	except Exception, e:
-	    		print "SecondaryServer Failed"
+	    		url = 'http://'+SecondaryServerIP
+	    		payload = {'data' : jobs[self.jobid] , 'From' : 'Server','Jobid' : self.jobid , 'ClientID' : -1} # for secondary server to know who sent it need to change in the secondary server server part
+	    		# ClientID = -1 means no client failure, otherwise it means the given ID has failed
+	    		try:
+	    			ro = requests.post(url,data = payload, proxies= proxyDict, timeout = connect_timeout) # can send only the jobs to reduce the messages
+	    		except Exception, e:
+	    			print "SecondaryServer Failed"
+
 
 
 class Client_Failure(threading.Thread):
 
 	def __init__(self,clientid):
 		threading.Thread.__init__(self)
-		self.clientid = clientid
+		self.clientid = str(clientid)
 	def run(self):
 		print "--------------Client_Failure----------------------", self.clientid
 
@@ -123,7 +125,7 @@ while True:
 		# print job
 		if jobs[job][4] == 'pending' or jobs[job][4] == 'failed' or jobs[job][4] == 'failed-request':
 			pending_jobs[job] = jobs[job]
-			pendingJobList.append(job)
+			pendingJobList.append(str(job))
 	# print pendingJobList
 	# print pending_jobs
 	if any(pending_jobs):
@@ -149,6 +151,7 @@ while True:
 		print "ID Submitted", pendingJobList[0]
 		print "-------------------------"
 		del pending_jobs[pendingJobList[0]]
+		DwJob = {}
 		with open(lockFile,'w+') as lf:
 			fcntl.flock(lf,fcntl.LOCK_EX)
 			with open(jobFile,'r+') as fp:
@@ -180,7 +183,7 @@ while True:
 		print "trying to delete"
 		del pendingJobList[0]
 		print "deleted...."
-	time.sleep(3)
+	time.sleep(1)
 
 
 
