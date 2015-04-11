@@ -70,7 +70,8 @@ def SendGetPrim():
 		print "Taking over as the Primary Server"
 		t1 = threading.Thread(target = handle_jobs_sec)
 		t2 = threading.Thread(target = SendGet)
-		t1.start()		
+		t1.start()
+		t2.start()		
 
 
 def main():
