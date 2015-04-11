@@ -83,8 +83,9 @@ class Client_Failure(threading.Thread):
 				except Exception, e:
 					jobs = {}
 				print "------- Reassigned JobIds ---------"
+				# print jobs
 				for job in jobs:
-					if jobs[job][1] == self.clientid and jobs[job][4] == "started" :
+					if str(jobs[job][1]) == str(self.clientid) and jobs[job][4] == "started" :
 						jobs[job][4] = "failed"
 						print "Reassgn Job : ", job
 				fp.truncate(0)
