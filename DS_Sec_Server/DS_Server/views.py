@@ -45,6 +45,7 @@ def index(request):
 		print "Posting"
 		From = request.POST.__getitem__('From')
 		if From == 'Client':
+			print "FROM CLIENT"
 			Output = request.POST.__getitem__('Output')
 			JobStatus = request.POST.__getitem__('JobStatus')
 			Jobid = request.POST.__getitem__('Jobid')
@@ -74,6 +75,7 @@ def index(request):
 			# 	print "SecondaryServer not working"
 			return HttpResponse("OK")
 		elif From == 'Web': #for handling web request
+			print "FROM WEB"
 			# ipAddrOfPOST = str(request.META['REMOTE_ADDR'])
 			#save timestamp of post
 			# Save the file sent
@@ -147,16 +149,23 @@ def index(request):
 			return HttpResponse(jobid) #check 
 		elif From == 'Server':
 			# needs change
+			print "FROM SERVER"
+
 			with open(dirWhereItWillSave+ jobFile, 'r+') as fp:
+				print "abcd"
 				jobs = {}
 				try:
 					jobs = json.load(fp)
 				except Exception, e:
 					jobs = {}
-				ClientID = int(request.POST.__getitem__['ClientID'])
+				ClientID = int(request.POST.__getitem__("ClientID"))
+				# print ClientID
 				if ClientID < 0:
-					jobid = int(request.POST.__getitem__['Jobid'])
+					# print ClientID
+					jobid = int(request.POST.__getitem__('Jobid'))
+					# print dict(request.POST)
 					jobdata = dict(request.POST)['data']
+					# print jobdata
 					jobs[jobid] = jobdata
 				else:
 					for job in jobs:
@@ -165,6 +174,7 @@ def index(request):
 				fp.truncate(0)
 				fp.seek(0)
 				json.dump(jobs,fp)
+			return HttpResponse("OK")
 
 
 
