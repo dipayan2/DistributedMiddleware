@@ -35,6 +35,7 @@ class Submit_Jobs(threading.Thread):
 	    		response = 0
 	    	# print "cnsdkjfnj"
 	    	if response == 0:
+	    		print "Failure to submit jobs in Primary Server"
 	    		jobs = {}
 	    		with open(lockFile,'w+') as lf:
 	    			fcntl.flock(lf,fcntl.LOCK_EX)
@@ -60,7 +61,7 @@ class Submit_Jobs(threading.Thread):
 	    		try:
 	    			ro = requests.post(url,data = payload, proxies= proxyDict, timeout = connect_timeout) # can send only the jobs to reduce the messages
 	    		except Exception, e:
-	    			print "SecondaryServer Failed"
+	    			print "Secondary Server Failed Submitting Jobs"
 
 
 
@@ -96,7 +97,7 @@ class Client_Failure(threading.Thread):
 		try:
 			r = requests.post(url,data=payload,proxies=proxyDict, timeout = connect_timeout)
 		except Exception, e:
-			print "SecondaryServer Failed"
+			print "Secondary Server Failed"
 		# with open(lockFilePS,'w+') as jf:
 		# 	fcntl.flock(jf,fcntl.LOCK_EX)
 		# 	with open(psutilFile,'r+') as fp:
@@ -135,11 +136,11 @@ while True:
 		print Client
 		NoClients = len(Client)
 		for i in xrange(1,NoClients+1):
-			print "Last", LastClientUsed
+			# print "Last", LastClientUsed
 			if int(Client["http://"+str(getListofIP()[(int(LastClientUsed)+int(i))% int(NoClients)])]) == -1:
 				FailedID = (int(LastClientUsed)+ int(i)) % int(NoClients)
 				c = Client_Failure(FailedID)
-				print "----- Client failure called----------"
+				print "----- Client failure called----------", FailedID
 				c.start()
 			elif int(Client["http://"+str(getListofIP()[(int(LastClientUsed)+int(i)) % int(NoClients)])]) > 15000000:
 				LastClientUsed = (int(LastClientUsed)+int(i)) % int(NoClients)
@@ -155,9 +156,9 @@ while True:
 		with open(lockFile,'w+') as lf:
 			fcntl.flock(lf,fcntl.LOCK_EX)
 			with open(jobFile,'r+') as fp:
-				print "waiting for lock 1"
+				# print "waiting for lock 1"
 				fcntl.flock(fp,fcntl.LOCK_EX)
-				print "lock acquired 1"
+				# print "lock acquired 1"
 				DwJob = json.load(fp)
 				# print "Job Correct Submission", DwJob
 				if DwJob[pendingJobList[0]][4] == 'failed-request':
@@ -171,18 +172,18 @@ while True:
 				# print DwJob
 				json.dump(DwJob,fp)
 				fcntl.flock(fp,fcntl.LOCK_UN)
-				print "lock released 1"
+				# print "lock released 1"
 			fcntl.flock(lf,fcntl.LOCK_UN)
 		url =  'http://'+SecondaryServerIP
 		payload = {'data': DwJob[pendingJobList[0]] ,'From':'Server','Jobid': pendingJobList[0],'ClientID': -1}
 		try:
 			r = requests.post(url,data = payload,proxies= proxyDict, timeout = connect_timeout)
 		except Exception, e:
-			print "SecondaryServer not workng"
+			print "Secondary Server Cannot Modify Submitted Jobs"
 		
-		print "trying to delete"
+		# print "trying to delete"
 		del pendingJobList[0]
-		print "deleted...."
+		# print "deleted...."
 	time.sleep(1)
 
 

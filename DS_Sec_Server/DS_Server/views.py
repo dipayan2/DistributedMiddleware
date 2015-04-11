@@ -42,15 +42,16 @@ def index(request):
 
 	# here we need to handle different POST whether from client or Web
 	if request.method == 'POST':
-		print "Posting"
 		From = request.POST.__getitem__('From')
+		print "Posting"
 		if From == 'Client':
 			print "FROM CLIENT"
 			Output = request.POST.__getitem__('Output')
 			JobStatus = request.POST.__getitem__('JobStatus')
 			Jobid = request.POST.__getitem__('Jobid')
-			print Jobid, Output
-			print dirWhereItWillSave,jobFile
+			print Jobid, JobStatus
+			print "Output", Output
+			# print dirWhereItWillSave,jobFile
 			with open(lockFile,'w+') as lf:
 				fcntl.flock(lf,fcntl.LOCK_EX)
 				with open(dirWhereItWillSave+jobFile,'r+') as fp:
@@ -79,7 +80,7 @@ def index(request):
 			# ipAddrOfPOST = str(request.META['REMOTE_ADDR'])
 			#save timestamp of post
 			# Save the file sent
-			print "Web"
+			# print "Web"
 			username = request.POST.__getitem__('username')
 			Command = request.POST.__getitem__('Command')
 			# print username, Command
@@ -95,7 +96,7 @@ def index(request):
 			# fileReceived = open(dirWhereItWillSave + name, "r+")
 			# virtualMemory, swapMemory = fileReceived.read().split('\n')[0:2]
 			# fileReceived.close()
-			print username
+			# print username
 			jobid = -1
 			## Function of reading and writing in file
 			print dirWhereItWillSave,Jname
@@ -114,16 +115,16 @@ def index(request):
 				fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock to be implemented
 			job = retrieve_Job(username,name,Command)
 			#print jobid
-			print "job", jobid
+			print "Job Id Submitted : ", jobid
 			with open(lockFile,'w+') as lf:
 				fcntl.flock(lf,fcntl.LOCK_EX)
 				with open(dirWhereItWillSave+jobFile, 'r+') as fp:
-					print "JobsFile opening"
+					# print "JobsFile opening"
 					fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock
 					jobs = {}
 					try:
 						jobs = json.load(fp)
-						print "Jobs Loaded"
+						# print "Jobs Loaded"
 						# print jobs
 					except Exception, e:
 						jobs = {}
@@ -131,7 +132,7 @@ def index(request):
 					jobs[jobid] = job
 					fp.truncate(0)
 					fp.seek(0)
-					print "New Jobs"
+					# print "New Jobs"
 					# print jobs
 					json.dump(jobs, fp)
 					# print "Dumped ", jobs
@@ -152,7 +153,7 @@ def index(request):
 			print "FROM SERVER"
 
 			with open(dirWhereItWillSave+ jobFile, 'r+') as fp:
-				print "abcd"
+				# print "abcd"
 				jobs = {}
 				try:
 					jobs = json.load(fp)

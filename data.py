@@ -49,7 +49,7 @@ def saveAsJson(data, filename):
 		files = psutilFile
 		tempLockFile = lockFilePS
 	# waiting lock here
-	print files
+	# print files
 	with open(tempLockFile,'w+') as lf:
 		fcntl.flock(lf,fcntl.LOCK_EX)
 		with open(files, 'w+') as fp:
