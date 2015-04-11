@@ -122,7 +122,7 @@ def index(request):
 					try:
 						jobs = json.load(fp)
 						print "Jobs Loaded"
-						print jobs
+						# print jobs
 					except Exception, e:
 						jobs = {}
 					#print jobs
@@ -132,7 +132,7 @@ def index(request):
 					print "New Jobs"
 					# print jobs
 					json.dump(jobs, fp)
-					print "Dumped ", jobs
+					# print "Dumped ", jobs
 					fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock	
 				fcntl.flock(lf,fcntl.LOCK_UN)
 			# wait to send response until job is complete	
@@ -177,9 +177,10 @@ def index(request):
 			JobStatus = data[Jobid][4]
 			Output = data[Jobid][5]
 			ClientId = data[Jobid][1]
-			print "Jobid", Jobid
-			print "Output", Output
-			print "Status", JobStatus
+			print "Jobid ", Jobid
+			print "Output ", Output
+			print "Status ", JobStatus
+			print "ClientId ", ClientId
 			if JobStatus == "finished":
 				return HttpResponse(str(ClientId)+" : "+str(Output))
 			else:

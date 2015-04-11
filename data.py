@@ -21,7 +21,7 @@ ipAddrFile = os.getcwd() + "/ipAddr.json"
 lockFilePS = os.getcwd() + "/lockFilePS.json"
 
 # to store the nodes which are not working
-connect_timeout = 5.0
+connect_timeout = 1.0
 read_timeout = 0.05
 
 def getListofIP():

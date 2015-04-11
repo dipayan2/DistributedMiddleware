@@ -78,10 +78,11 @@ class Client_Failure(threading.Thread):
 					jobs = json.load(fp)
 				except Exception, e:
 					jobs = {}
-				
+				print "------- Reassigned JobIds ---------"
 				for job in jobs:
 					if jobs[job][1] == self.clientid and jobs[job][4] == "started" :
 						jobs[job][4] = "failed"
+						print job
 				fp.truncate(0)
 				fp.seek(0)
 				json.dump(jobs, fp)
@@ -119,7 +120,7 @@ while True:
 	for job in jobs:
 		# print "Within"
 		# print job
-		if jobs[job][4] == 'pending' or jobs[job][4] == 'failed':
+		if jobs[job][4] == 'pending' or jobs[job][4] == 'failed' or jobs[job][4] == 'failed-request':
 			pending_jobs[job] = jobs[job]
 			pendingJobList.append(job)
 	# print pendingJobList
