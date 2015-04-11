@@ -27,7 +27,7 @@ print os.getcwd()
 # else:
 # 	print "LOGIN DENIED"
 # 	sys.exit()
-connect_timeout = 1.0
+#connect_timeout = 1.0
 username = 'admin'
 while True:
 	inp = raw_input("ENTER COMMAND:")
@@ -36,7 +36,8 @@ while True:
 		filename = words[1]
 		com = inp[len(words[1])+5:]
 		url = 'http://'+PrimIP
-		payload = {'From':'Web','username':username,'Commmand':com} 
+		payload = {'From':'Web','username':username,'Command':com} 
+		print payload
 		files = {'file':open(filename,'rb')}
 		print url
 		print com
@@ -50,22 +51,22 @@ while True:
 			flag = 1
 			print r.status_code
 			print "PRIMARY HAS FAILED"
-		url = 'http://'+SecondaryServerIP
-		r = requests.post(url,files = files,data = payload, proxies= proxyDict)
-		if r.status_code == requests.codes.ok:
-			print "SecondaryServer FAILED"	
-		if flag == 1:
-			print r.content
+		# url = 'http://'+SecondaryServerIP
+		# r = requests.post(url,files = files,data = payload, proxies= proxyDict)
+		# if r.status_code == requests.codes.ok:
+		# 	print "SecondaryServer FAILED"	
+		# if flag == 1:
+		# 	print r.content
 	elif words[0] == 'status':
 		jobid = int(words[1])
 		url = 'http://'+PrimIP
 		try:
 			header = {'From':'Web','USERNAME':username,'JOBID':jobid}			
-			r = requests.get(url, proxies = proxyDict, timeout = connect_timeout)
+			r = requests.get(url, proxies = proxyDict, timeout = connect_timeout, headers = header)
 		except exception as e:
 			url = 'http://'+SecondaryServerIP
 			header = {'From':'Web','USERNAME':username,'JOBID':jobid}
-			r = requests.get(url, proxies = proxyDict, timeout = connect_timeout,params = header)
+			r = requests.get(url, proxies = proxyDict, timeout = connect_timeout,headers = header)
 			print r.content
 	else:
 		print "WRONG SELECTION"

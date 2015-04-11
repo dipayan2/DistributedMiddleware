@@ -3,16 +3,20 @@ import json
 import os
 
 users = {'admin':'admin123'}
-ListofIP = ["localhost:8002"]
-PrimIP = "localhost:8004"
+ListofIP = ["localhost:8003","localhost:8007"]
+PrimIP = "localhost:8006"
 
-#MainServerIP = "http://localhost:8004"
+MainServerIP = "http://" + PrimIP
 SecondaryServerIP = "localhost:8001"
 
 # psutilFile = "/home/dipayan/Desktop/Distributed-Systems-Project/psutilFile.json"
 # jobFile = "/home/dipayan/Desktop/Distributed-Systems-Project/jobFile.json"
 psutilFile = os.getcwd() + "/psutilFile.json"
 jobFile = os.getcwd() + "/jobFile.json"
+
+# to store the nodes which are not working
+connect_timeout = 1.0
+read_timeout = 0.05
 
 def saveAsJson(data, filename):
 	if filename == "jobs":
@@ -34,10 +38,10 @@ def loadFromJson(filename):
 			files = jobFile
 		else:
 			files = filename
-		print files
+		# print files
 		with open(files, 'r+') as fp:
 		#waiting lock here
-			print "blabla"
+			# print "blabla"
 			fcntl.flock(fp, fcntl.LOCK_EX)
 			data = json.load(fp)
 			fcntl.flock(fp, fcntl.LOCK_UN)

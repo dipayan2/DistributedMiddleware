@@ -12,9 +12,7 @@ import json
 
 from data import *
 
-# to store the nodes which are not working
-connect_timeout = 1.0
-read_timeout = 0.05
+
 # need to format the output
 def SendGet():
 	# This code will send get requests to all clients

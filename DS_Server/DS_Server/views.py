@@ -74,8 +74,10 @@ def index(request):
 			# ipAddrOfPOST = str(request.META['REMOTE_ADDR'])
 			#save timestamp of post
 			# Save the file sent
+			print "Web"
 			username = request.POST.__getitem__('username')
 			Command = request.POST.__getitem__('Command')
+			# print username, Command
 			name = ''
 			# inputfilename = request.POST.__getitem__('inputfilename')
 			for filename, file in request.FILES.iteritems():
@@ -107,7 +109,9 @@ def index(request):
 				fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock to be implemented
 			job = retrieve_Job(username,name,Command)
 			#print jobid
+			print "job", jobid
 			with open(dirWhereItWillSave+jobFile, 'r+') as fp:
+				print "JobsFile opening"
 				fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock
 				jobs = {}
 				try:
@@ -117,7 +121,7 @@ def index(request):
 				except Exception, e:
 					jobs = {}
 				#print jobs
-				jobs[int(jobid)] = job
+				jobs[jobid] = job
 				fp.truncate(0)
 				fp.seek(0)
 				print "New Jobs"
