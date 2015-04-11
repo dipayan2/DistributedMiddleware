@@ -26,6 +26,7 @@ def index(request):
 
 	if request.method == 'POST':
 
+		# print "fnsdf"
 		# IP Address of the requesting POST service
 		ipAddrOfPOST = str(request.META['REMOTE_ADDR'])
 
@@ -41,7 +42,9 @@ def index(request):
 		# for item in request.POST.items():
 		# 	print item
 
+		# print "dcamsld"
 		# Command to run
+		# print request.POST
 		command = request.POST.__getitem__('Command')
 		command = command.replace('+',' ')
 		commandList = command.split()
@@ -62,7 +65,7 @@ def index(request):
 		command.append(dirWhereItWillExec)
 		command.append(jobID)
 		command.extend(commandList)
-		print command
+		# print command
 
 		# Run the process
 		process = Popen(command, stdout=PIPE, cwd = dirOfCleintPOSTFile)
@@ -72,12 +75,13 @@ def index(request):
 		# print exit_code
 		# print output, err, exit_code
 
+		print "Got a POST from ", ipAddrOfPOST, " and running the file with jobID : ", jobID
 		return HttpResponse("File Running")
 
 	elif request.method == 'GET':
 
 		# psutil calls
-		print "swapMemory"
+		# print "swapMemory"
 		virtualMemory = str(psutil.virtual_memory())
 		# swapMemory = str(psutil.swap_memory())
 

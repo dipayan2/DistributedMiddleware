@@ -99,7 +99,7 @@ def index(request):
 			# print username
 			jobid = -1
 			## Function of reading and writing in file
-			print dirWhereItWillSave,Jname
+			# print dirWhereItWillSave,Jname
 			with open(dirWhereItWillSave+Jname,'r+') as fp:
 				fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock to be implemented
 				data = {}

@@ -20,14 +20,14 @@ def SendGet():
 	responseArr = {}
 	for Ip in getListofIP():
 		Addr = "http://"+str(Ip)
-		print Addr
+		print Addr,
 		# Addr = "http://localhost:8001"
 		try:
 			r = requests.get(Addr, proxies = proxyDict, timeout = connect_timeout)
 			mem_data = r.content
 			mem = mem_data.split("free=")[1]
 			mem = mem.split("L")[0]
-			print "running"
+			print "   is running"
 			responseArr[Addr] = int(mem)
 		except Exception, e:
 			print e

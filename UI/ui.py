@@ -30,33 +30,35 @@ print os.getcwd()
 #connect_timeout = 1.0
 username = 'admin'
 while True:
-	inp = raw_input("ENTER COMMAND:")
+	inp = raw_input("ENTER COMMAND: ")
 	words = inp.split(" ") # will split the command as well 
 	if words[0] == 'run':
 		filename = words[1]
 		com = inp[len(words[1])+5:]
 		url = 'http://'+PrimIP
 		payload = {'From':'Web','username':username,'Command':com} 
-		print payload
+		# print payload
 		files = {'file':open(filename,'rb')}
-		print url
-		print com
-		print username
-		print filename
+		print "Sending to url : ", url
+		# print com
+		# print username
+		# print filename
 		r = requests.post(url,files = files,data = payload, proxies= proxyDict)
 		if r.status_code == requests.codes.ok:
-			print r.content
+			# print r.content
+			print "Successfully sent to primary with jobID : ", r.content
 			flag = 0
 		else:
 			flag = 1
-			print r.status_code
+			# print r.status_code
 			print "PRIMARY HAS FAILED"
 		url = 'http://'+SecondaryServerIP
 		r = requests.post(url,files = files,data = payload, proxies= proxyDict)
 		if r.status_code == requests.codes.ok:
-			print "SecondaryServer Sent"	
+			print "Successfully Sent to Secondary Server with jobID : ", r.content	
 		if flag == 1:
-			print r.content
+			# print r.content
+			pass
 	elif words[0] == 'status':
 		jobid = int(words[1])
 		url = 'http://'+PrimIP
@@ -69,4 +71,4 @@ while True:
 			r = requests.get(url, proxies = proxyDict, timeout = connect_timeout,headers = header)
 			print r.content
 	else:
-		print "WRONG SELECTION"
+		print "WRONG SELECTION...TRY AGAIN"

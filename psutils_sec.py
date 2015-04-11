@@ -20,23 +20,24 @@ def SendGet():
 	threading.Timer(10.0,SendGet).start()
 	responseArr = {}
 	if run_sec == 1: 
-		print "run_sec is 1"
+		# print "run_sec is 1"
 		for Ip in getListofIP():
 			Addr = "http://"+str(Ip)
-			print Addr
+			print Addr,
 			# Addr = "http://localhost:8001"
 			try:
 				r = requests.get(Addr, proxies = proxyDict, timeout = connect_timeout)
 				mem_data = r.content
 				mem = mem_data.split("free=")[1]
 				mem = mem.split("L")[0]
-				print "running"
+				print "    is running"
 				responseArr[Addr] = int(mem)
 			except Exception, e:
 				print e
 				responseArr[Addr] = -1
 	else:
-		print "waiting for permission"
+		# print "waiting for permission"
+		pass
 
 
 	# with open(psutilFile, "w+") as g:
@@ -53,18 +54,20 @@ def SendGetPrim():
 	t = threading.Timer(10.0,SendGetPrim)
 	t.start()
 	Addr = "http://"+PrimIP
-	print "Entereed SendGetPrim"
+	print "Checking whether Prime is alive....",
 	connect_timeout = 10.0
 	try:
-		print "in try"
+		# print "in try"
 		r =  requests.get(Addr, proxies = proxyDict, timeout = connect_timeout,headers = headerType)
 		responseSec = r.content
-		print "content:",r.content
+		print r.content
 	except Exception, e:	
-		print e
+		# print e
+		print "Primary server has failed"
 		responseSec = "Prim Server failed"
 		run_sec = 1
 		t.cancel()
+		print "Taking over as the Primary Server"
 		t1 = threading.Thread(target = handle_jobs_sec)
 		t1.start()		
 
