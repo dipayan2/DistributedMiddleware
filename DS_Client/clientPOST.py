@@ -38,7 +38,7 @@ def runFile(dirWhereItWillExec, commandList, jobID):
 	except Exception, e:
 		print "Main Server Failed"
 		try:
-			r = requests.post(SecondaryServerIP, data = dataToSend, proxies = proxyDict)
+			r = requests.post("http://" + SecondaryServerIP, data = dataToSend, proxies = proxyDict)
 		except Exception, e:
 			print "Both Servers Failed...System Critical"
 

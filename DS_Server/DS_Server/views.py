@@ -50,20 +50,23 @@ def index(request):
 			Jobid = request.POST.__getitem__('Jobid')
 			print Jobid, Output
 			print dirWhereItWillSave,jobFile
-			with open(dirWhereItWillSave+jobFile,'r+') as fp:
-				fcntl.flock(fp,fcntl.LOCK_EX)
-				jobs = {}
-				try:
-					jobs = json.load(fp)
-					jobs[Jobid][4] = JobStatus
-					jobs[Jobid][5] = Output
-				except Exception, e:
+			with open(lockFile,'w+') as lf:
+				fcntl.flock(lf,fcntl.LOCK_EX)
+				with open(dirWhereItWillSave+jobFile,'r+') as fp:
+					fcntl.flock(fp,fcntl.LOCK_EX)
 					jobs = {}
-				fp.truncate(0)
-				fp.seek(0)
-				json.dump(jobs,fp)
-				# jobs[self.][1] = self.clientid
-				fcntl.flock(fp,fcntl.LOCK_UN)
+					try:
+						jobs = json.load(fp)
+						jobs[Jobid][4] = JobStatus
+						jobs[Jobid][5] = Output
+					except Exception, e:
+						jobs = {}
+					fp.truncate(0)
+					fp.seek(0)
+					json.dump(jobs,fp)
+					# jobs[self.][1] = self.clientid
+					fcntl.flock(fp,fcntl.LOCK_UN)
+				fcntl.flock(lf,fcntl.LOCK_UN)
 			url = 'http://'+SecondaryServerIP
 			try:
 				r = requests.post(url,data = jobs, proxies= proxyDict)
@@ -110,24 +113,28 @@ def index(request):
 			job = retrieve_Job(username,name,Command)
 			#print jobid
 			print "job", jobid
-			with open(dirWhereItWillSave+jobFile, 'r+') as fp:
-				print "JobsFile opening"
-				fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock
-				jobs = {}
-				try:
-					jobs = json.load(fp)
-					print "Jobs Loaded"
-					print jobs
-				except Exception, e:
+			with open(lockFile,'w+') as lf:
+				fcntl.flock(lf,fcntl.LOCK_EX)
+				with open(dirWhereItWillSave+jobFile, 'r+') as fp:
+					print "JobsFile opening"
+					fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock
 					jobs = {}
-				#print jobs
-				jobs[jobid] = job
-				fp.truncate(0)
-				fp.seek(0)
-				print "New Jobs"
-				print jobs
-				json.dump(jobs, fp)
-				fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock	
+					try:
+						jobs = json.load(fp)
+						print "Jobs Loaded"
+						print jobs
+					except Exception, e:
+						jobs = {}
+					#print jobs
+					jobs[jobid] = job
+					fp.truncate(0)
+					fp.seek(0)
+					print "New Jobs"
+					# print jobs
+					json.dump(jobs, fp)
+					print "Dumped ", jobs
+					fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock	
+				fcntl.flock(lf,fcntl.LOCK_UN)
 			# wait to send response until job is complete	
 			#print jobs
 			url = 'http://'+SecondaryServerIP
@@ -166,6 +173,7 @@ def index(request):
 			username = request.META['HTTP_USERNAME']
 			Jobid = request.META['HTTP_JOBID']
 			data = loadFromJson(dirWhereItWillSave+jobFile)
+			# print "cjjsiodjfi", data, dirWhereItWillSave, jobFile
 			JobStatus = data[Jobid][4]
 			Output = data[Jobid][5]
 			ClientId = data[Jobid][1]

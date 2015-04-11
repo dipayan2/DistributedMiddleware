@@ -18,8 +18,9 @@ def SendGet():
 	# This code will send get requests to all clients
 	threading.Timer(10.0,SendGet).start()
 	responseArr = {}
-	for Ip in ListofIP:
+	for Ip in getListofIP():
 		Addr = "http://"+str(Ip)
+		print Addr
 		# Addr = "http://localhost:8001"
 		try:
 			r = requests.get(Addr, proxies = proxyDict, timeout = connect_timeout)
@@ -29,6 +30,7 @@ def SendGet():
 			print "running"
 			responseArr[Addr] = int(mem)
 		except Exception, e:
+			print e
 			responseArr[Addr] = -1
 
 

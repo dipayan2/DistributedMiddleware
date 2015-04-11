@@ -26,6 +26,7 @@ def index(request):
 
 	if request.method == 'POST':
 
+		# print "fnsdf"
 		# IP Address of the requesting POST service
 		ipAddrOfPOST = str(request.META['REMOTE_ADDR'])
 
@@ -41,7 +42,9 @@ def index(request):
 		# for item in request.POST.items():
 		# 	print item
 
+		# print "dcamsld"
 		# Command to run
+		print request.POST
 		command = request.POST.__getitem__('Command')
 		command = command.replace('+',' ')
 		commandList = command.split()

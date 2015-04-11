@@ -14,7 +14,7 @@ class Submit_Jobs(threading.Thread):
 	    	self.clientid = clientid
 	    
 	    def run(self):
-	    	urlc = "http://"+str(ListofIP[self.clientid])
+	    	urlc = "http://"+str(getListofIP()[self.clientid])
 	    	command = self.job[3]
 	    	filename = self.job[2]
 	    	payload = {'Command': command , 'Jobid' : self.jobid}
@@ -57,7 +57,7 @@ class Client_Failure(threading.Thread):
 
 def handle_jobs_sec():
 	LastClientUsed = 0
-	NoClients = len(ListofIP)
+	NoClients = len(getListofIP())
 	# Should constantly loop arouund to find whether there is any pending job and send it to a client
 	while True:
 		jobs = loadFromJson("jobs")
@@ -70,11 +70,11 @@ def handle_jobs_sec():
 		if any(pending_jobs):
 			Client = loadFromJson("psutil")
 			for i in xrange(0,NoClients):
-				if Client["http://"+str(ListofIP[(int(LastClientUsed)+int(i))% int(NoClients)])] == -1:
+				if Client["http://"+str(getListofIP()[(int(LastClientUsed)+int(i))% int(NoClients)])] == -1:
 					FailedID = (int(LastClientUsed)+ int(i)) % int(NoClients)
 					c = Client_Failure(FailedID)
 					c.start()
-				if Client["http://"+str(ListofIP[(int(LastClientUsed)+int(i)) % int(NoClients)])] > 15000000:
+				if Client["http://"+str(getListofIP()[(int(LastClientUsed)+int(i)) % int(NoClients)])] > 15000000:
 					LastClientUsed = (int(LastClientUsed)+int(i)) % int(NoClients)
 					break
 			t = Submit_Jobs(pending_jobs[pendingJobList[0]], LastClientUsed)
