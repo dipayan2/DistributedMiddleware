@@ -9,7 +9,7 @@ users = {'admin':'admin123'}
 PrimIP = "10.132.148.165:8000"
 
 MainServerIP = "http://" + PrimIP
-SecondaryServerIP = "10.140.150.171:8006"
+SecondaryServerIP = "10.140.150.171:8000"
 # SecondaryServerIP = "http://localhost:7000"
 
 # psutilFile = "/home/dipayan/Desktop/Distributed-Systems-Project/psutilFile.json"
@@ -82,7 +82,7 @@ def loadFromJson(filename):
 			fcntl.flock(lf,fcntl.LOCK_UN)
 		return data
 	except Exception, e:
-		print e
+		# print e
 		return {}
 	
 

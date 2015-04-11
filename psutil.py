@@ -30,7 +30,8 @@ def SendGet():
 			print "   is running"
 			responseArr[Addr] = int(mem)
 		except Exception, e:
-			print e
+			# print e
+			print "   is not running"
 			responseArr[Addr] = -1
 
 
