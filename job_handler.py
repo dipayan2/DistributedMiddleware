@@ -51,10 +51,15 @@ class Client_Failure(threading.Thread):
 		threading.Thread.__init__(self)
 		self.clientid = clientid
 	def run(self):
-		print "Client_Failure"
+		print "Client_Failure", self.clientid
 		with open(jobFile, 'r+') as fp:
 			fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock to be added
-			jobs = json.load(fp)
+			jobs = {}
+			try:
+				jobs = json.load(fp)
+			except Exception, e:
+				jobs = {}
+			
 			for job in jobs:
 				if jobs[job][1] == self.clientid and jobs[job][4] == "started" :
 					jobs[job][4] = "failed"

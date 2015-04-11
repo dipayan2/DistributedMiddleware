@@ -3,11 +3,11 @@ import json
 import os
 
 users = {'admin':'admin123'}
-ListofIP = ["localhost:8005"]
-PrimIP = "10.5.30.143:8001"
+ListofIP = ["localhost:8002"]
+PrimIP = "localhost:8004"
 
-MainServerIP = "http://localhost:8004"
-SecondaryServerIP = "http://localhost:8001"
+#MainServerIP = "http://localhost:8004"
+SecondaryServerIP = "localhost:8001"
 
 # psutilFile = "/home/dipayan/Desktop/Distributed-Systems-Project/psutilFile.json"
 # jobFile = "/home/dipayan/Desktop/Distributed-Systems-Project/jobFile.json"
@@ -30,6 +30,8 @@ def loadFromJson(filename):
 	try:
 		if filename == "psutil":
 			files = psutilFile
+		elif filename == "jobs":
+			files = jobFile
 		else:
 			files = filename
 		print files

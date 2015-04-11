@@ -21,12 +21,15 @@ from server_utils import *
 import psutil
 import sys, inspect
 
-users = {'admin':'admin123'}
-ListofIP = ["localhost:8001"]
-PrimIP = "10.5.30.143:8001"
+# users = {'admin':'admin123'}
+# ListofIP = ["localhost:8001"]
+# PrimIP = "10.5.30.143:8001"
 
-MainServerIP = "http://localhost:8000"
-SecondaryServerIP = "http://localhost:8001"
+# MainServerIP = "http://localhost:8000"
+# SecondaryServerIP = "http://localhost:8001"
+
+MainServerIP = 'http://'+PrimIP
+SecServerIP = 'http://'+SecondaryServerIP
 
 # dirWhereItWillSave = '/home/subham/DS/'
 dirWhereItWillSave = parentdir + "/"
@@ -114,7 +117,7 @@ def index(request):
 				except Exception, e:
 					jobs = {}
 				#print jobs
-				jobs[jobid] = job
+				jobs[int(jobid)] = job
 				fp.truncate(0)
 				fp.seek(0)
 				print "New Jobs"

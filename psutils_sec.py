@@ -11,27 +11,27 @@ import fcntl
 import json
 
 from data import *
-from job_handler_sec.py import *
 
 # to store the nodes which are not working
 connect_timeout = 1.0
 read_timeout = 0.05
-
-run_sec = 0
 # need to format the output
 def SendGet():
 	# This code will send get requests to all clients
 	threading.Timer(10.0,SendGet).start()
 	responseArr = {}
-	if(global run_sec == 1):
-		for Ip in ListofIP:
-			Addr = "http://"+str(Ip)
-			# Addr = "http://localhost:8001"
-			try:
-				r = requests.get(Addr, proxies = proxyDict, timeout = (connect_timeout, read_timeout))
-				responseArr[Addr] = r.content
-			except requests.exceptions.ConnectTimeout as e:
-				responseArr[Addr] = "Client Failed"
+	for Ip in ListofIP:
+		Addr = "http://"+str(Ip)
+		# Addr = "http://localhost:8001"
+		try:
+			r = requests.get(Addr, proxies = proxyDict, timeout = connect_timeout)
+			mem_data = r.content
+			mem = mem_data.split("free=")[1]
+			mem = mem.split("L")[0]
+			print "running"
+			responseArr[Addr] = int(mem)
+		except Exception, e:
+			responseArr[Addr] = -1
 
 
 	# with open(psutilFile, "w+") as g:
@@ -49,7 +49,7 @@ def SendGetPrim():
 	t.start()
 	Addr = "http://"+PrimIP
 	try:
-		r =  requests.get(Addr, proxies = proxyDict, timeout = (connect_timeout, read_timeout),header = headerType)
+		r =  requests.get(Addr, proxies = proxyDict, timeout = connect_timeout,params = headerType)
 		responseSec = r.content
 	except as e:	
 		responseSec = "Prim Server failed"

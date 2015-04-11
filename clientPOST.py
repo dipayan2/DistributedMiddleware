@@ -27,13 +27,14 @@ def runFile(dirWhereItWillExec, commandList, jobID):
 
 	# Send POST
 	# headerType = {'content-type': 'application/x-www-form-urlencoded'}
-
+	MainServerIP = 'http://'+PrimIP
+	SecServerIP = 'http://'+SecondaryServerIP
 	try:
 		r = requests.post(MainServerIP, data = dataToSend, proxies = proxyDict)
 	except Exception, e:
 		print "Main Server Failed"
 		try:
-			r = requests.post(SecondaryServerIP, data = dataToSend, proxies = proxyDict)
+			r = requests.post(SecServerIP, data = dataToSend, proxies = proxyDict)
 		except Exception, e:
 			print "Both Servers Failed...System Critical"
 
