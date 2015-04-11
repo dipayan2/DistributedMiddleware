@@ -9,7 +9,7 @@ users = {'admin':'admin123'}
 PrimIP = "10.132.148.165:8000"
 
 MainServerIP = "http://" + PrimIP
-SecondaryServerIP = "localhost:7001"
+SecondaryServerIP = "10.140.150.171:8004"
 # SecondaryServerIP = "http://localhost:7000"
 
 # psutilFile = "/home/dipayan/Desktop/Distributed-Systems-Project/psutilFile.json"

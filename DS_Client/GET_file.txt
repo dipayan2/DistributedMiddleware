@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 vmem(total=6147543040L, available=2007212032L, percent=67.3, used=5863813120L, free=283729920L, active=3801866240, inactive=1629122560, buffers=243101696L, cached=1480380416)
+=======
+vmem(total=4003471360L, available=1234337792L, percent=69.2, used=3754905600L, free=248565760L, active=2370899968, inactive=909979648, buffers=138919936L, cached=846852096)
+>>>>>>> a8a17e731559a74f0cb08ae214782e61d6288a6e
