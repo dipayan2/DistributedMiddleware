@@ -39,6 +39,7 @@ def index(request):
 
 	# here we need to handle different POST whether from client or Web
 	if request.method == 'POST':
+		print "Posting"
 		From = request.POST.__getitem__('From')
 		if From == 'Client':
 			Output = request.POST.__getitem__('Output')
@@ -55,7 +56,7 @@ def index(request):
 					jobs[Jobid][5] = Output
 				except Exception, e:
 					jobs = {}
-				fp.truncate()
+				fp.truncate(0)
 				fp.seek(0)
 				json.dump(jobs,fp)
 				# jobs[self.][1] = self.clientid
@@ -97,23 +98,27 @@ def index(request):
 					data["Jobid"] = "-1"
 				jobid = int(data["Jobid"])+1
 				data["Jobid"] = jobid
-				fp.truncate()
+				fp.truncate(0)
 				fp.seek(0)
 				json.dump(data, fp)
 				fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock to be implemented
 			job = retrieve_Job(username,name,Command)
 			#print jobid
-			with open(dirWhereItWillSave+ jobFile, 'r+') as fp:
+			with open(dirWhereItWillSave+jobFile, 'r+') as fp:
 				fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock
 				jobs = {}
 				try:
 					jobs = json.load(fp)
+					print "Jobs Loaded"
+					print jobs
 				except Exception, e:
 					jobs = {}
 				#print jobs
 				jobs[jobid] = job
-				fp.truncate()
+				fp.truncate(0)
 				fp.seek(0)
+				print "New Jobs"
+				print jobs
 				json.dump(jobs, fp)
 				fcntl.flock(fp,fcntl.LOCK_UN) # waiting lock	
 			# wait to send response until job is complete	
@@ -127,6 +132,7 @@ def index(request):
 			
 			return HttpResponse(jobid) #check 
 		elif From == 'Server':
+			# needs change
 			with open(dirWhereItWillSave+ jobFile, 'r+') as fp:
 				jobs = {}
 				try:
@@ -142,7 +148,7 @@ def index(request):
 					for job in jobs:
 						if jobs[job][1] == Clientid and jobs[job][4] == "started" :
 							jobs[job][4] = "failed"
-				fp.truncate()
+				fp.truncate(0)
 				fp.seek(0)
 				json.dump(jobs,fp)
 
@@ -156,6 +162,9 @@ def index(request):
 			JobStatus = data[Jobid][4]
 			Output = data[Jobid][5]
 			ClientId = data[Jobid][1]
+			print "Jobid", Jobid
+			print "Output", Output
+			print "Status", JobStatus
 			if JobStatus == "finished":
 				return HttpResponse(str(ClientId)+" : "+str(Output))
 			else:

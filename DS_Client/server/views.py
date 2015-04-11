@@ -77,6 +77,7 @@ def index(request):
 	elif request.method == 'GET':
 
 		# psutil calls
+		print "swapMemory"
 		virtualMemory = str(psutil.virtual_memory())
 		# swapMemory = str(psutil.swap_memory())
 

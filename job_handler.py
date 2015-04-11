@@ -31,16 +31,18 @@ class Submit_Jobs(threading.Thread):
 	    		with open(jobFile,'r+') as fp:
 	    			fcntl.flock(fp,fcntl.LOCK_EX)
 	    			jobs = json.load(fp)
+	    			print "Jobs For Submitting Error"
+	    			print jobs
 	    			jobs[self.jobid][4] = 'failed-request'
 	    			jobs[self.jobid][1] = self.clientid
-	    			fp.truncate()
+	    			fp.truncate(0)
 	    			fp.seek(0)
 	    			json.dump(jobs,fp)
 	    			fcntl.flock(fp,fcntl.LOCK_UN)
 	    			url = 'http://'+SecondaryServerIP
 	    			payload = {'data' : jobs[self.jobid] , 'From' : 'Server','Jobid' : self.jobid , 'ClientID' : -1} # for secondary server to know who sent it need to change in the secondary server server part
 	    			# ClientID = -1 means no client failure, otherwise it means the given ID has failed
-	    			r = requests.post(url,data = payload, proxies= proxyDict) # can send only the jobs to reduce the messages
+	    			ro = requests.post(url,data = payload, proxies= proxyDict) # can send only the jobs to reduce the messages
 
 
 class Client_Failure(threading.Thread):
@@ -49,13 +51,14 @@ class Client_Failure(threading.Thread):
 		threading.Thread.__init__(self)
 		self.clientid = clientid
 	def run(self):
+		print "Client_Failure"
 		with open(jobFile, 'r+') as fp:
 			fcntl.flock(fp, fcntl.LOCK_EX) # waiting lock to be added
 			jobs = json.load(fp)
 			for job in jobs:
 				if jobs[job][1] == self.clientid and jobs[job][4] == "started" :
 					jobs[job][4] = "failed"
-			fp.truncate()
+			fp.truncate(0)
 			fp.seek(0)
 			json.dump(jobs, fp)
 			fcntl.flock(fp, fcntl.LOCK_UN) # waiting lock to be added
@@ -65,7 +68,7 @@ class Client_Failure(threading.Thread):
 
 
 LastClientUsed = 0
-#NoClients = 1 # TO BE CHANGED
+NoClients = len(ListofIP)
 # Should constantly loop arouund to find whether there is any pending job and send it to a client
 while True:
 	print "JobHandler"
@@ -85,40 +88,42 @@ while True:
 	if any(pending_jobs):
 		print "Changing jobs"
 		Client = loadFromJson("psutil")
-		NoClients = len(ListofIP)
-
+		
 		for i in xrange(0,NoClients):
 			if int(Client["http://"+str(ListofIP[(int(LastClientUsed)+int(i))% int(NoClients)])]) == -1:
-				FailedID = (LastClientUsed+ i) % NoClients
+				FailedID = (int(LastClientUsed)+ int(i)) % int(NoClients)
 				c = Client_Failure(FailedID)
 				c.start()
 			if int(Client["http://"+str(ListofIP[(int(LastClientUsed)+int(i)) % int(NoClients)])]) > 15000000:
-				LastClientUsed = (LastClientUsed+i) % NoClients
+				LastClientUsed = (int(LastClientUsed)+int(i)) % int(NoClients)
 				break
 		t = Submit_Jobs(pending_jobs[pendingJobList[0]],pendingJobList[0], LastClientUsed)
 		t.start()
 		print "Job Submitted"
-		
+		print "ID Submitted", pendingJobList[0]
 		del pending_jobs[pendingJobList[0]]
 		with open(jobFile,'r+') as fp:
 			fcntl.flock(fp,fcntl.LOCK_EX)
 			DwJob = json.load(fp)
+			print "Job Correct Submission", DwJob
 			if DwJob[pendingJobList[0]][4] == 'failed-request':
 				DwJob[pendingJobList[0]][4] = 'failed'
 			else:
 				DwJob[pendingJobList[0]][4] = 'started'
-				DwJob[pendingJobList[0]][1] = LastClientUsed
-			fp.truncate()
+				DwJob[pendingJobList[0]][1] = int(LastClientUsed)
+			fp.truncate(0)
 			fp.seek(0)
+			print "After Changing"
+			print DwJob
 			json.dump(DwJob,fp)
 			fcntl.flock(fp,fcntl.LOCK_UN)
-			url =  'http://'+SecondaryServerIP
-			payload = {'data': DwJob[pendingJobList[0]] ,'From':'Server','Jobid': pendingJobList[0],'ClientID': -1}
-			try:
-				r = requests.post(url,data = payload,proxies= proxyDict)
-			except Exception, e:
-				print "SecondaryServer not workng"
-			
+		url =  'http://'+SecondaryServerIP
+		payload = {'data': DwJob[pendingJobList[0]] ,'From':'Server','Jobid': pendingJobList[0],'ClientID': -1}
+		try:
+			r = requests.post(url,data = payload,proxies= proxyDict)
+		except Exception, e:
+			print "SecondaryServer not workng"
+		
 		del pendingJobList[0]
 	time.sleep(3)
 

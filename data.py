@@ -28,10 +28,10 @@ def saveAsJson(data, filename):
 
 def loadFromJson(filename):
 	try:
-		if filename == "jobs":
-			files = jobFile
-		elif filename == "psutil":
+		if filename == "psutil":
 			files = psutilFile
+		else:
+			files = filename
 		print files
 		with open(files, 'r+') as fp:
 		#waiting lock here
