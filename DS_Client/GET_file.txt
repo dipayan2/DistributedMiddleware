@@ -1,1 +1,1 @@
-vmem(total=4003471360L, available=1020264448L, percent=74.5, used=3728064512L, free=275406848L, active=2244198400, inactive=1135976448, buffers=100319232L, cached=644538368)
+vmem(total=4003471360L, available=905605120L, percent=77.4, used=3730661376L, free=272809984L, active=2270777344, inactive=1101295616, buffers=98906112L, cached=533889024)

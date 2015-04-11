@@ -43,9 +43,9 @@ def index(request):
 	# here we need to handle different POST whether from client or Web
 	if request.method == 'POST':
 		From = request.POST.__getitem__('From')
-		print "Posting"
+		print "Posting From:",From
 		if From == 'Client':
-			print "FROM CLIENT"
+			# print "FROM CLIENT"
 			Output = request.POST.__getitem__('Output')
 			JobStatus = request.POST.__getitem__('JobStatus')
 			Jobid = request.POST.__getitem__('Jobid')
@@ -76,7 +76,7 @@ def index(request):
 			# 	print "SecondaryServer not working"
 			return HttpResponse("OK")
 		elif From == 'Web': #for handling web request
-			print "FROM WEB"
+			# print "FROM WEB"
 			# ipAddrOfPOST = str(request.META['REMOTE_ADDR'])
 			#save timestamp of post
 			# Save the file sent
@@ -150,7 +150,7 @@ def index(request):
 			return HttpResponse(jobid) #check 
 		elif From == 'Server':
 			# needs change
-			print "FROM SERVER"
+			# print "FROM SERVER"
 
 			with open(dirWhereItWillSave+ jobFile, 'r+') as fp:
 				# print "abcd"

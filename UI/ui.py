@@ -66,7 +66,7 @@ while True:
 			header = {'From':'Web','USERNAME':username,'JOBID':jobid}			
 			r = requests.get(url, proxies = proxyDict, timeout = connect_timeout, headers = header)
 			print r.content
-		except exception as e:
+		except Exception, e:
 			url = 'http://'+SecondaryServerIP
 			header = {'From':'Web','USERNAME':username,'JOBID':jobid}
 			r = requests.get(url, proxies = proxyDict, timeout = connect_timeout,headers = header)
