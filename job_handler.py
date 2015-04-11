@@ -34,6 +34,7 @@ class Submit_Jobs(threading.Thread):
 	    	except Exception, e:
 	    		response = 0
 	    	# print "cnsdkjfnj"
+	    	jobs = {}
 	    	if response == 0:
 	    		with open(lockFile,'w+') as lf:
 	    			fcntl.flock(lf,fcntl.LOCK_EX)
@@ -51,14 +52,14 @@ class Submit_Jobs(threading.Thread):
 	    				json.dump(jobs,fp)
 	    				fcntl.flock(fp,fcntl.LOCK_UN)
 	    				# print "lock released 1"
-	    				url = 'http://'+SecondaryServerIP
-	    				payload = {'data' : jobs[self.jobid] , 'From' : 'Server','Jobid' : self.jobid , 'ClientID' : -1} # for secondary server to know who sent it need to change in the secondary server server part
-	    				# ClientID = -1 means no client failure, otherwise it means the given ID has failed
-	    				try:
-	    					ro = requests.post(url,data = payload, proxies= proxyDict, timeout = connect_timeout) # can send only the jobs to reduce the messages
-	    				except Exception, e:
-	    					print "SecondaryServer Failed"
 	    			fcntl.flock(lf,fcntl.LOCK_UN)
+	    	url = 'http://'+SecondaryServerIP
+	    	payload = {'data' : jobs[self.jobid] , 'From' : 'Server','Jobid' : self.jobid , 'ClientID' : -1} # for secondary server to know who sent it need to change in the secondary server server part
+	    	# ClientID = -1 means no client failure, otherwise it means the given ID has failed
+	    	try:
+	    		ro = requests.post(url,data = payload, proxies= proxyDict, timeout = connect_timeout) # can send only the jobs to reduce the messages
+	    	except Exception, e:
+	    		print "SecondaryServer Failed"
 
 
 class Client_Failure(threading.Thread):
@@ -87,13 +88,13 @@ class Client_Failure(threading.Thread):
 				fp.seek(0)
 				json.dump(jobs, fp)
 				fcntl.flock(fp, fcntl.LOCK_UN) # waiting lock to be added
-				url = 'http://'+SecondaryServerIP
-				payload = {'From':'Server','ClientID':self.clientid}
-				try:
-					r = requests.post(url,data=payload,proxies=proxyDict, timeout = connect_timeout)
-				except Exception, e:
-					print "SecondaryServer Failed"
 			fcntl.flock(lf,fcntl.LOCK_UN)
+		url = 'http://'+SecondaryServerIP
+		payload = {'From':'Server','ClientID':self.clientid}
+		try:
+			r = requests.post(url,data=payload,proxies=proxyDict, timeout = connect_timeout)
+		except Exception, e:
+			print "SecondaryServer Failed"
 		# with open(lockFilePS,'w+') as jf:
 		# 	fcntl.flock(jf,fcntl.LOCK_EX)
 		# 	with open(psutilFile,'r+') as fp:
