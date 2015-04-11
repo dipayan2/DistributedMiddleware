@@ -19,7 +19,8 @@ def SendGet():
 	# This code will send get requests to all clients
 	threading.Timer(10.0,SendGet).start()
 	responseArr = {}
-	if global run_sec == 1: 
+	if run_sec == 1: 
+		print "run_sec is 1"
 		for Ip in getListofIP():
 			Addr = "http://"+str(Ip)
 			print Addr
@@ -34,6 +35,8 @@ def SendGet():
 			except Exception, e:
 				print e
 				responseArr[Addr] = -1
+	else:
+		print "waiting for permission"
 
 
 	# with open(psutilFile, "w+") as g:
@@ -47,15 +50,20 @@ def SendGet():
 def SendGetPrim():
 	headerType = {'FROM': 'Server'}
 
-	t = threading.Timer(10.0,SendGet)
+	t = threading.Timer(10.0,SendGetPrim)
 	t.start()
 	Addr = "http://"+PrimIP
+	print "Entereed SendGetPrim"
+	connect_timeout = 10.0
 	try:
-		r =  requests.get(Addr, proxies = proxyDict, timeout = connect_timeout,params = headerType)
+		print "in try"
+		r =  requests.get(Addr, proxies = proxyDict, timeout = connect_timeout,headers = headerType)
 		responseSec = r.content
-	except as e:	
+		print "content:",r.content
+	except Exception, e:	
+		print e
 		responseSec = "Prim Server failed"
-		global run_sec = 1
+		run_sec = 1
 		t.cancel()
 		t1 = threading.Thread(target = handle_jobs_sec)
 		t1.start()		

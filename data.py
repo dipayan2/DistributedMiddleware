@@ -6,7 +6,7 @@ import operator
 
 users = {'admin':'admin123'}
 # ListofIP = ["10.132.80.139:8000","10.132.80.139:8001", "10.140.150.171:8000", "10.140.150.171:8002"]
-PrimIP = "localhost:8000"
+PrimIP = "10.132.148.165:8000"
 
 MainServerIP = "http://" + PrimIP
 SecondaryServerIP = "localhost:7001"
