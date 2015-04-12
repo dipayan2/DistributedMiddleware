@@ -108,7 +108,8 @@ def index(request):
 				except Exception, e:
 					data["Jobid"] = "-1"
 				jobid = int(data["Jobid"])+1
-				data["Jobid"] = jobid
+				jobid = str(jobid)
+				data["Jobid"] = str(jobid)
 				fp.truncate(0)
 				fp.seek(0)
 				json.dump(data, fp)

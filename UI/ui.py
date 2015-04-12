@@ -43,18 +43,24 @@ while True:
 		# print com
 		# print username
 		# print filename
+		mainServerFailed = False
+		secFiles = {'file':open(filename,'rb')}
 		try:
 			r = requests.post(url,files = files,data = payload, proxies= proxyDict)
 			print "Successfully sent to primary with jobID : ", r.content
 		except Exception, e:
 			print "PRIMARY HAS FAILED"
-			url = 'http://'+SecondaryServerIP
-			try:
-				r = requests.post(url,files = files,data = payload, proxies= proxyDict)
+			mainServerFailed = True
+		url = 'http://'+SecondaryServerIP
+		try:
+			r = requests.post(url,files = secFiles,data = payload, proxies= proxyDict)
+			if mainServerFailed:
 				print "Successfully Sent to Secondary Server with jobID : ", r.content
-			except Exception, e:
-				print "Secondary Server is not reachanble"
-				
+			else :
+				print "Successfully Sent to Secondary Server"
+		except Exception, e:
+			print "Secondary Server is not reachanble"
+
 	elif words[0] == 'status':
 		jobid = int(words[1])
 		url = 'http://'+PrimIP

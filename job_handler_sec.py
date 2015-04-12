@@ -12,7 +12,7 @@ class Submit_Jobs(threading.Thread):
 	    	threading.Thread.__init__(self)
 	    	self.job = job     # this job is a list needs different handling
 	    	self.clientid = clientid
-	    	self.jobid = jobid
+	    	self.jobid = str(jobid)
 	    
 	    def run(self):
 	    	# print "Submitting"
@@ -66,7 +66,7 @@ class Client_Failure(threading.Thread):
 
 	def __init__(self,clientid):
 		threading.Thread.__init__(self)
-		self.clientid = clientid
+		self.clientid = str(clientid)
 	def run(self):
 		print "--------------Client_Failure----------------------", self.clientid
 
@@ -126,20 +126,24 @@ def handle_jobs_sec():
 					pendingJobList.append(job)
 			# print pendingJobList
 			# print pending_jobs
+			Client = loadFromJson("psutil")
+			# print Client
+			NoClients = len(Client)
+			for i in xrange(1,NoClients+1):
+				# print "Last", LastClientUsed
+				if int(Client["http://"+str(getListofIP()[(int(LastClientUsed)+int(i))% int(NoClients)])]) == -1:
+					FailedID = (int(LastClientUsed)+ int(i)) % int(NoClients)
+					c = Client_Failure(FailedID)
+					print "----- Client failure called----------"
+					c.start()
 			if any(pending_jobs):
 				# print "Changing jobs"
 				# print "No of clients",NoClients
-				Client = loadFromJson("psutil")
+				# Client = loadFromJson("psutil")
 				# print Client
 				NoClients = len(Client)
 				for i in xrange(1,NoClients+1):
-					# print "Last", LastClientUsed
-					if int(Client["http://"+str(getListofIP()[(int(LastClientUsed)+int(i))% int(NoClients)])]) == -1:
-						FailedID = (int(LastClientUsed)+ int(i)) % int(NoClients)
-						c = Client_Failure(FailedID)
-						print "----- Client failure called----------"
-						c.start()
-					elif int(Client["http://"+str(getListofIP()[(int(LastClientUsed)+int(i)) % int(NoClients)])]) > 15000000:
+					if int(Client["http://"+str(getListofIP()[(int(LastClientUsed)+int(i)) % int(NoClients)])]) > 15000000:
 						LastClientUsed = (int(LastClientUsed)+int(i)) % int(NoClients)
 						break
 				# print "LastClientUsed", LastClientUsed 
