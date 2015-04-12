@@ -13,28 +13,27 @@ import json
 from data import *
 from job_handler_sec import *
 
-run_sec = 0
+# run_sec = 0
 # need to format the output
 def SendGet():
 	# This code will send get requests to all clients
 	threading.Timer(10.0,SendGet).start()
 	responseArr = {}
-	if run_sec == 1: 
-		# print "run_sec is 1"
-		for Ip in getListofIP():
-			Addr = "http://"+str(Ip)
-			print Addr,
-			# Addr = "http://localhost:8001"
-			try:
-				r = requests.get(Addr, proxies = proxyDict, timeout = connect_timeout)
-				mem_data = r.content
-				mem = mem_data.split("free=")[1]
-				mem = mem.split("L")[0]
-				print "    is running"
-				responseArr[Addr] = int(mem)
-			except Exception, e:
-				print e
-				responseArr[Addr] = -1
+	# print "run_sec is 1"
+	for Ip in getListofIP():
+		Addr = "http://"+str(Ip)
+		print Addr,
+		# Addr = "http://localhost:8001"
+		try:
+			r = requests.get(Addr, proxies = proxyDict, timeout = connect_timeout)
+			mem_data = r.content
+			mem = mem_data.split("free=")[1]
+			mem = mem.split("L")[0]
+			print "    is running"
+			responseArr[Addr] = int(mem)
+		except Exception, e:
+			# print e
+			responseArr[Addr] = -1
 	else:
 		# print "waiting for permission"
 		pass
@@ -65,7 +64,6 @@ def SendGetPrim():
 		# print e
 		print "Primary server has failed"
 		responseSec = "Prim Server failed"
-		run_sec = 1
 		t.cancel()
 		print "Taking over as the Primary Server"
 		t1 = threading.Thread(target = handle_jobs_sec)

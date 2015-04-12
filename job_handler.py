@@ -130,20 +130,24 @@ while True:
 			pendingJobList.append(str(job))
 	# print pendingJobList
 	# print pending_jobs
+	Client = loadFromJson("psutil")
+	NoClients = len(Client)
+	for i in xrange(1,NoClients+1):
+		# print "Last", LastClientUsed
+		if int(Client["http://"+str(getListofIP()[(int(LastClientUsed)+int(i))% int(NoClients)])]) == -1:
+			FailedID = (int(LastClientUsed)+ int(i)) % int(NoClients)
+			c = Client_Failure(FailedID)
+			print "----- Client failure called----------", FailedID
+			c.start()
 	if any(pending_jobs):
 		# print "Changing jobs"
 		print "No of clients",NoClients
-		Client = loadFromJson("psutil")
+		# Client = loadFromJson("psutil")
 		# print Client
 		NoClients = len(Client)
 		for i in xrange(1,NoClients+1):
 			# print "Last", LastClientUsed
-			if int(Client["http://"+str(getListofIP()[(int(LastClientUsed)+int(i))% int(NoClients)])]) == -1:
-				FailedID = (int(LastClientUsed)+ int(i)) % int(NoClients)
-				c = Client_Failure(FailedID)
-				print "----- Client failure called----------", FailedID
-				c.start()
-			elif int(Client["http://"+str(getListofIP()[(int(LastClientUsed)+int(i)) % int(NoClients)])]) > 15000000:
+			if int(Client["http://"+str(getListofIP()[(int(LastClientUsed)+int(i)) % int(NoClients)])]) > 15000000:
 				LastClientUsed = (int(LastClientUsed)+int(i)) % int(NoClients)
 				break
 		# print "LastClientUsed", LastClientUsed 

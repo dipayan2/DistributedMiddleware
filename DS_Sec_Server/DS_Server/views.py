@@ -170,7 +170,7 @@ def index(request):
 					jobs[jobid] = jobdata
 				else:
 					for job in jobs:
-						if jobs[job][1] == Clientid and jobs[job][4] == "started" :
+						if str(jobs[job][1]) == str(ClientID) and jobs[job][4] == "started" :
 							jobs[job][4] = "failed"
 				fp.truncate(0)
 				fp.seek(0)

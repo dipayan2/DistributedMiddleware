@@ -167,7 +167,7 @@ def index(request):
 					print "Job File Update in Secondary Server"
 				else:
 					for job in jobs:
-						if jobs[job][1] == Clientid and jobs[job][4] == "started" :
+						if str(jobs[job][1]) == str(ClientID) and jobs[job][4] == "started" :
 							jobs[job][4] = "failed"
 					print "Client Failure Situation Handled in Secondary Server"
 				fp.truncate(0)
